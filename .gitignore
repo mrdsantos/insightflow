@@ -1,0 +1,40 @@
+# Ambiente e segredos
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Dados derivados. O CSV bruto do gerador vai versionado: o enunciado exige
+# o dataset simulado no repositorio.
+data/interim/
+data/processed/
+*.parquet
+
+# Logs
+logs/
+*.log
+
+# Editor
+.vscode/
+.idea/
+*.code-workspace
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
