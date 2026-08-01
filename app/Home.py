@@ -10,9 +10,6 @@ import filtros
 import theme
 import ui
 
-MESES = ["jan", "fev", "mar", "abr", "mai", "jun",
-         "jul", "ago", "set", "out", "nov", "dez"]
-
 st.title("Como o negocio esta performando e para onde esta indo?")
 
 op = filtros.opcoes()
@@ -104,8 +101,8 @@ fig.add_scatter(
     showlegend=False, hoverinfo="skip", cliponaxis=False,
 )
 fig.update_layout(title="Faturamento mensal", height=380)
-fig.update_xaxes(type="category")
-st.plotly_chart(fig, width="stretch", key="serie_mensal")
+fig.update_xaxes(type="category", **ui.eixo_mes(serie["ano_mes"], passo=2))
+st.plotly_chart(fig, width="stretch", key="serie_mensal", config=ui.CONFIG_GRAFICO)
 ui.gemeo_tabular(serie)
 
 
@@ -120,14 +117,14 @@ fig = go.Figure()
 for i, ano in enumerate(anos):
     d = saz[saz["ano"] == ano].sort_values("mes")
     fig.add_scatter(
-        x=[MESES[m - 1] for m in d["mes"]], y=d["faturamento"],
+        x=[ui.MESES[m - 1] for m in d["mes"]], y=d["faturamento"],
         mode="lines", name=str(ano),
         line=dict(color=theme.SLOTS[i], width=2),
     )
 fig.update_layout(title="Sazonalidade ano a ano", height=380)
-fig.update_xaxes(categoryorder="array", categoryarray=MESES)
+fig.update_xaxes(categoryorder="array", categoryarray=ui.MESES)
 with col_esq:
-    st.plotly_chart(fig, width="stretch", key="sazonalidade")
+    st.plotly_chart(fig, width="stretch", key="sazonalidade", config=ui.CONFIG_GRAFICO)
     ui.gemeo_tabular(saz)
 
 
@@ -145,5 +142,5 @@ fig = go.Figure(
 )
 fig.update_layout(title="Faturamento por categoria", height=380)
 with col_dir:
-    st.plotly_chart(fig, width="stretch", key="categorias")
+    st.plotly_chart(fig, width="stretch", key="categorias", config=ui.CONFIG_GRAFICO)
     ui.gemeo_tabular(cat.sort_values("faturamento", ascending=False))

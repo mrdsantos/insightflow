@@ -73,7 +73,7 @@ fig.update_layout(
     height=480,
 )
 fig.update_xaxes(tickangle=-45)
-st.plotly_chart(fig, width="stretch", key="pareto")
+st.plotly_chart(fig, width="stretch", key="pareto", config=ui.CONFIG_GRAFICO)
 ui.gemeo_tabular(pareto)
 
 
@@ -96,13 +96,16 @@ if categorias:
             mode="lines", line=dict(color=theme.AZUL, width=2),
             showlegend=False, name=categoria,
             row=i // n_col + 1, col=i % n_col + 1,
+            customdata=d["ano_mes"].map(ui.rotulo_mes),
+            hovertemplate="%{customdata}: %{y:.1f}%<extra>" + categoria + "</extra>",
         )
     fig.add_hline(y=0, line_color=theme.EIXO, line_width=1)
     fig.update_layout(
         title="Crescimento MoM por categoria (%)", height=220 * n_lin + 80
     )
+    fig.update_xaxes(**ui.eixo_mes(cresc["ano_mes"], passo=6, como_data=True))
     fig.update_annotations(font=dict(size=12, color=theme.TINTA_SECUNDARIA))
-    st.plotly_chart(fig, width="stretch", key="mom_categorias")
+    st.plotly_chart(fig, width="stretch", key="mom_categorias", config=ui.CONFIG_GRAFICO)
     ui.gemeo_tabular(cresc)
 
 
@@ -147,5 +150,5 @@ fig.update_layout(
     height=480,
     hoverdistance=24,
 )
-st.plotly_chart(fig, width="stretch", key="matriz_produtos")
+st.plotly_chart(fig, width="stretch", key="matriz_produtos", config=ui.CONFIG_GRAFICO)
 ui.gemeo_tabular(prod_met)

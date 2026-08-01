@@ -33,19 +33,11 @@ teste = prev[prev["fase"] == "teste"]
 futuro = prev[prev["fase"] == "futuro"]
 reg = met[met["modelo"] == "regressao"].iloc[0]
 
-MESES = ["jan", "fev", "mar", "abr", "mai", "jun",
-         "jul", "ago", "set", "out", "nov", "dez"]
-
-
-def rotulo_mes(ano_mes: str) -> str:
-    return f"{MESES[int(ano_mes[5:]) - 1]}/{ano_mes[:4]}"
-
-
 # ---- KPIs -------------------------------------------------------------------
 
 proximo = futuro.iloc[0]
 c1, c2, c3, c4 = st.columns(4)
-ui.stat_tile(c1, f"Previsao para {rotulo_mes(proximo['ano_mes'])}",
+ui.stat_tile(c1, f"Previsao para {ui.rotulo_mes(proximo['ano_mes'])}",
              ui.fmt_compacto(proximo["previsto"]))
 ui.stat_tile(c2, "MAE da regressao (teste)", ui.fmt_compacto(reg["mae"]))
 ui.stat_tile(c3, "MAPE da regressao (teste)", ui.fmt_pct(reg["mape"]))
@@ -68,6 +60,7 @@ datas_futuro = pd.to_datetime(
     pd.concat([pd.Series([emenda["ano_mes"]]), futuro["ano_mes"]]) + "-01"
 )
 linha_previsto = pd.concat([pd.Series([emenda["realizado"]]), futuro["previsto"]])
+rot_futuro = pd.concat([pd.Series([emenda["ano_mes"]]), futuro["ano_mes"]]).map(ui.rotulo_mes)
 
 fig = go.Figure()
 fig.add_scatter(
@@ -82,14 +75,20 @@ fig.add_scatter(
 fig.add_scatter(
     x=datas_realizado, y=realizado["realizado"], mode="lines",
     name="Realizado", line=dict(color=theme.AZUL, width=2),
+    customdata=realizado["ano_mes"].map(ui.rotulo_mes),
+    hovertemplate="%{customdata}: R$ %{y:,.0f}<extra>Realizado</extra>",
 )
 fig.add_scatter(
     x=datas_teste, y=teste["ajustado"], mode="lines",
     name="Ajustado no teste", line=dict(color=theme.LARANJA, width=2),
+    customdata=teste["ano_mes"].map(ui.rotulo_mes),
+    hovertemplate="%{customdata}: R$ %{y:,.0f}<extra>Ajustado no teste</extra>",
 )
 fig.add_scatter(
     x=datas_futuro, y=linha_previsto, mode="lines",
     name="Projecao", line=dict(color=theme.AZUL, width=2, dash="dash"),
+    customdata=rot_futuro,
+    hovertemplate="%{customdata}: R$ %{y:,.0f}<extra>Projecao</extra>",
 )
 for fase, inicio in [("teste", teste["ano_mes"].iloc[0]), ("projecao", futuro["ano_mes"].iloc[0])]:
     x = pd.Timestamp(inicio + "-01")
@@ -104,7 +103,8 @@ fig.update_layout(
     yaxis_title="Faturamento (R$)",
     height=460,
 )
-st.plotly_chart(fig, width="stretch", key="previsao")
+fig.update_xaxes(**ui.eixo_mes(prev["ano_mes"], passo=3, como_data=True))
+st.plotly_chart(fig, width="stretch", key="previsao", config=ui.CONFIG_GRAFICO)
 ui.gemeo_tabular(prev)
 
 

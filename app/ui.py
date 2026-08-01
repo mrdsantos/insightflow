@@ -10,6 +10,33 @@ import streamlit as st
 
 import theme
 
+# A modebar do Plotly e fixa em ingles no bundle. Sai sem perda: todo grafico
+# tem gemeo tabular, que e o caminho oficial para ler o valor.
+CONFIG_GRAFICO = {"displayModeBar": False}
+
+MESES = ["jan", "fev", "mar", "abr", "mai", "jun",
+         "jul", "ago", "set", "out", "nov", "dez"]
+
+
+def rotulo_mes(ano_mes: str) -> str:
+    """'2026-07' -> 'jul/2026'."""
+    return f"{MESES[int(ano_mes[5:]) - 1]}/{ano_mes[:4]}"
+
+
+def eixo_mes(ano_mes, passo: int = 1, como_data: bool = False) -> dict:
+    """Ticks de mes em pt-BR, para `fig.update_xaxes(**ui.eixo_mes(...))`.
+
+    Sem isso o Plotly rotula eixo de data no locale dele e sai "Jan 2026".
+    Com como_data=True os tickvals saem como Timestamp, para o eixo continuar
+    sendo datetime - a previsao depende disso por causa das linhas de fase.
+    """
+    meses = sorted(set(ano_mes))[::passo]
+    return dict(
+        tickmode="array",
+        tickvals=[pd.Timestamp(m + "-01") for m in meses] if como_data else meses,
+        ticktext=[rotulo_mes(m) for m in meses],
+    )
+
 
 def fmt_num(v: float, decimais: int = 0) -> str:
     s = f"{v:,.{decimais}f}"

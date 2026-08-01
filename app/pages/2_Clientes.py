@@ -86,7 +86,7 @@ with aba_seg:
         height=420,
     )
     with col_esq:
-        st.plotly_chart(fig, width="stretch", key="rfm_heatmap")
+        st.plotly_chart(fig, width="stretch", key="rfm_heatmap", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(
             grade.reset_index().rename(columns={"score_f": "score_f \\ score_r"})
         )
@@ -105,7 +105,7 @@ with aba_seg:
     )
     fig.update_layout(title="Clientes por segmento RFM", height=420)
     with col_dir:
-        st.plotly_chart(fig, width="stretch", key="rfm_segmentos")
+        st.plotly_chart(fig, width="stretch", key="rfm_segmentos", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(seg.sort_values("clientes", ascending=False).reset_index())
 
     fig = go.Figure(
@@ -118,7 +118,7 @@ with aba_seg:
     fig.update_layout(title="Receita por segmento RFM", height=420)
     col_esq2, col_dir2 = st.columns(2)
     with col_esq2:
-        st.plotly_chart(fig, width="stretch", key="rfm_receita")
+        st.plotly_chart(fig, width="stretch", key="rfm_receita", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(
             seg.sort_values("receita", ascending=False).reset_index()[
                 ["segmento", "receita"]
@@ -156,7 +156,7 @@ with aba_seg:
         hoverdistance=24,
     )
     with col_dir2:
-        st.plotly_chart(fig, width="stretch", key="rfm_dispersao")
+        st.plotly_chart(fig, width="stretch", key="rfm_dispersao", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(rfm)
 
 
@@ -173,7 +173,7 @@ with aba_ret:
         go.Heatmap(
             z=matriz.values,
             x=[str(c) for c in matriz.columns],
-            y=matriz.index.tolist(),
+            y=[ui.rotulo_mes(m) for m in matriz.index],
             colorscale=RAMPA,
             zmin=0, zmax=100,
             colorbar=dict(title="% retido", outlinewidth=0),
@@ -187,7 +187,7 @@ with aba_ret:
         yaxis_autorange="reversed",
         height=560,
     )
-    st.plotly_chart(fig, width="stretch", key="coorte_heatmap")
+    st.plotly_chart(fig, width="stretch", key="coorte_heatmap", config=ui.CONFIG_GRAFICO)
     ui.gemeo_tabular(coorte)
 
     fig = go.Figure(
@@ -202,5 +202,5 @@ with aba_ret:
         yaxis_title="% medio retido",
         height=380,
     )
-    st.plotly_chart(fig, width="stretch", key="curva_retencao")
+    st.plotly_chart(fig, width="stretch", key="curva_retencao", config=ui.CONFIG_GRAFICO)
     ui.gemeo_tabular(curva)
