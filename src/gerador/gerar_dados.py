@@ -3,6 +3,10 @@
 Produz dados/ecom_data.csv com seed fixa: duas execucoes geram bytes identicos.
 Sazonalidade (novembro alto) e tendencia de crescimento sao plantadas de proposito
 para as analises do bloco 2 terem o que encontrar.
+
+A sujeira e aplicada por cima dos dados limpos com taxas fixas (constantes TAXA_*),
+para a quarentena esperada ficar previsivel e o relatorio de qualidade virar
+evidencia, nao surpresa.
 """
 
 import csv
@@ -85,6 +89,95 @@ CRESCIMENTO_MENSAL = 0.016  # tendencia suave
 SAZONALIDADE = {1: 0.92, 2: 0.88, 3: 0.95, 4: 0.97, 5: 1.02, 6: 0.98,
                 7: 0.96, 8: 0.99, 9: 1.00, 10: 1.05, 11: 1.75, 12: 1.30}
 
+# taxas de sujeira (fracao das linhas atingidas)
+TAXA_NULOS = 0.03
+TAXA_DUPLICATAS = 0.015
+TAXA_QTD_NEGATIVA = 0.010
+TAXA_STATUS_INVALIDO = 0.005
+TAXA_DATA_QUEBRADA = 0.005
+TAXA_MOEDA_QUEBRADA = 0.004
+TAXA_OUTLIER_PRECO = 0.006
+TAXA_CAIXA_CATEGORIA = 0.15
+TAXA_CAIXA_STATUS = 0.08
+
+COLUNAS_NULAVEIS = ["ID_Cliente", "Data_Venda", "Valor_Unitario", "Nome_Produto", "ID_Transacao"]
+
+VARIANTES_CATEGORIA = {
+    "Eletronicos": ["ELETRONICOS", "eletronicos", "Eletrônicos"],
+    "Acessorios": ["ACESSORIOS", "acessorios", "Acessórios"],
+    "Esporte": ["ESPORTE", "esporte"],
+    "Casa": ["CASA", "casa"],
+    "Livros": ["LIVROS", "livros"],
+    "Moda": ["MODA", "moda"],
+}
+STATUS_INVALIDOS = ["Em analise", "Aguardando pagamento", "Extraviado"]
+DATAS_QUEBRADAS = ["31/02/2025", "2025-13-07", "00/00/0000", "sem data"]
+MOEDAS_QUEBRADAS = ["R$ ???", "gratis", "1,2,3"]
+
+
+def _formata_moeda(valor, forma):
+    """Devolve o valor numa das 3 formas que circulam no CSV."""
+    inteiro, centavos = f"{valor:.2f}".split(".")
+    milhar = ""
+    while len(inteiro) > 3:
+        milhar = "." + inteiro[-3:] + milhar
+        inteiro = inteiro[:-3]
+    com_milhar = inteiro + milhar
+    if forma == "brl":
+        return f"R$ {com_milhar},{centavos}"
+    if forma == "decimal_virgula":
+        return f"{com_milhar},{centavos}"
+    return f"{valor:.2f}"
+
+
+def _suja(linhas, rng):
+    """Aplica a sujeira linha a linha com as taxas fixas e injeta duplicatas."""
+    formatos_data = ["iso", "br_barra", "br_traco"]
+    formas_moeda = ["brl", "decimal_virgula", "ponto"]
+
+    for linha in linhas:
+        # outlier de preco: legitimo, permanece no fato (nao vai para quarentena)
+        valor = float(linha["Valor_Unitario"])
+        if rng.random() < TAXA_OUTLIER_PRECO:
+            valor = round(valor * rng.uniform(6, 12), 2)
+
+        forma = rng.choices(formas_moeda, weights=[40, 25, 35], k=1)[0]
+        linha["Valor_Unitario"] = _formata_moeda(valor, forma)
+
+        formato = rng.choices(formatos_data, weights=[60, 25, 15], k=1)[0]
+        d = date.fromisoformat(linha["Data_Venda"])
+        if formato == "br_barra":
+            linha["Data_Venda"] = d.strftime("%d/%m/%Y")
+        elif formato == "br_traco":
+            linha["Data_Venda"] = d.strftime("%d-%m-%Y")
+
+        if rng.random() < TAXA_CAIXA_CATEGORIA:
+            linha["Categoria_Produto"] = rng.choice(VARIANTES_CATEGORIA[linha["Categoria_Produto"]])
+
+        if rng.random() < TAXA_CAIXA_STATUS:
+            linha["Status_Pedido"] = rng.choice([linha["Status_Pedido"].upper(),
+                                                 linha["Status_Pedido"].lower()])
+        if rng.random() < TAXA_STATUS_INVALIDO:
+            linha["Status_Pedido"] = rng.choice(STATUS_INVALIDOS)
+
+        if rng.random() < TAXA_QTD_NEGATIVA:
+            linha["Quantidade"] = rng.choice([-1, -2, 0])
+
+        if rng.random() < TAXA_DATA_QUEBRADA:
+            linha["Data_Venda"] = rng.choice(DATAS_QUEBRADAS)
+        if rng.random() < TAXA_MOEDA_QUEBRADA:
+            linha["Valor_Unitario"] = rng.choice(MOEDAS_QUEBRADAS)
+
+        if rng.random() < TAXA_NULOS:
+            linha[rng.choice(COLUNAS_NULAVEIS)] = ""
+
+    # duplicatas exatas de id_transacao espalhadas pelo arquivo
+    n_dup = int(len(linhas) * TAXA_DUPLICATAS)
+    for _ in range(n_dup):
+        original = rng.choice(linhas)
+        linhas.insert(rng.randrange(len(linhas)), dict(original))
+    return linhas
+
 
 def _gera_clientes(rng):
     """Clientes com peso de atividade e janela de vida, para RFM e coorte terem sinal."""
@@ -165,6 +258,8 @@ def gerar(caminho=CAMINHO_SAIDA):
                     "Metodo_Pagamento": metodo,
                     "Status_Pedido": status,
                 })
+
+    linhas = _suja(linhas, random.Random(SEED + 1))
 
     caminho.parent.mkdir(parents=True, exist_ok=True)
     with open(caminho, "w", newline="", encoding="utf-8") as f:
