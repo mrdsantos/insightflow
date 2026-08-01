@@ -33,8 +33,10 @@ views versionadas em `sql/views/`.
 Quintis, coortes e percentuais acumulados so tem validade calculados sobre a base inteira —
 recalcular por recorte mudaria a pergunta respondida. Por isso:
 
-- Respondem a **todos** os filtros (via WHERE no app): `vw_faturamento_mensal`, `vw_vendas`,
-  `vw_crescimento_categoria`.
+- Respondem a **todos** os filtros (via WHERE no app): `vw_faturamento_mensal`, `vw_vendas`.
+- Respondem a **periodo e categoria**: `vw_crescimento_categoria` - o MoM e pre-calculado com
+  janela por categoria, entao cortar UF exigiria recalcular a janela no app (proibido);
+  filtrar meses ou remover categorias inteiras nao altera o calculo.
 - Respondem **so a periodo**: `vw_kpis_mensais`.
 - **Base completa** (status = venda concretizada, sem reagir a filtro de categoria/UF):
   `vw_rfm`, `vw_coorte_retencao`, `vw_curva_retencao`, `vw_pareto_produtos`,

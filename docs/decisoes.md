@@ -46,6 +46,40 @@ O enunciado aceita Power BI, Tableau ou bibliotecas Python. Fui de Streamlit + P
 mantem todo o projeto em codigo versionavel, roda em container e publica como link
 publico sem licenca. Power BI nao entra nem como export.
 
+## Venda concretizada = Entregue + Enviado
+
+Toda analise de receita e comportamento (KPIs, RFM, coorte, Pareto) considera venda o pedido
+Entregue ou Enviado. Cancelado e Devolvido nao sao receita; Processando ainda pode virar
+cancelamento, entao fica fora por conservadorismo. Enviado entra porque a mercadoria saiu e
+a receita foi reconhecida - o risco de virar devolucao existe, mas o volume e pequeno e a
+alternativa (so Entregue) descartaria venda legitima em transito. Analise no notebook 02.
+
+## Churn com N = 90 dias
+
+Cliente e considerado churned quando passa de 90 dias sem comprar. O numero sai dos dados:
+o percentil 90 do intervalo entre compras consecutivas e 101 dias (notebook 02), e como os
+KPIs sao mensais o corte precisa ser multiplo de mes cheio - 3 meses e o multiplo mais
+proximo. Quem passa disso esta fora do ritmo de 9 em cada 10 recompras da base. Churn aqui
+e operacional (cliente esfriou), nao definitivo: cliente pode voltar e reaparecer como ativo.
+
+## Outlier marcado por IQR, nao z-score
+
+Para marcar outliers na analise o criterio e IQR (1.5x alem do Q3). O z-score pressupoe
+normalidade que a base nao tem (media de valor_unitario e 3x a mediana) e sofre de
+mascaramento: media e desvio sao calculados com os proprios outliers dentro, o que empurra
+o limite para cima. A comparacao numerica por categoria esta em `sql/consultas/q_outliers.sql`
+e no notebook 02.
+
+## Filtros do dashboard nao alcancam as views estruturais
+
+RFM, coorte, Pareto, metricas por produto e share do top 10% sao calculados sobre a base
+completa de vendas concretizadas e nao reagem aos filtros de categoria/UF/status. Quintil,
+coorte e percentual acumulado so tem validade sobre a base inteira - recalcular por recorte
+mudaria a pergunta respondida. Alem disso, `vw_crescimento_categoria` pre-calcula o MoM com
+janela por categoria, entao aceita so filtro de periodo e categoria: cortar UF exigiria
+recalcular a janela no app, e logica analitica nao roda no dashboard. Cada grafico estrutural
+leva nota curta na interface.
+
 ## Seed fixa no gerador
 
 `random.Random(SEED)` com seed constante no codigo. Duas execucoes geram o mesmo CSV
