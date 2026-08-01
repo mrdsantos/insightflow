@@ -19,6 +19,7 @@ PAGINAS = [
     "pages/2_Clientes.py",
     "pages/3_Produtos.py",
     "pages/4_Previsão.py",
+    "pages/5_Definições.py",
 ]
 
 
