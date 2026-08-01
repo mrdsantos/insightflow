@@ -7,6 +7,7 @@ import streamlit as st
 st.set_page_config(page_title="InsightFlow - Clientes", layout="wide")
 
 import dados
+import definicoes
 import filtros
 import theme
 import ui
@@ -36,20 +37,24 @@ c1, c2, c3, c4 = st.columns(4)
 ui.stat_tile(
     c1, "Clientes Ativos (média mensal)",
     ui.fmt_num(mensal["clientes_ativos"].mean()),
+    ajuda=definicoes.ajuda("clientes_ativos"),
     serie=mensal["clientes_ativos"], key="spark_ativos",
 )
 ui.stat_tile(
     c2, "Novos no Período", ui.fmt_num(mensal["clientes_novos"].sum()),
+    ajuda=definicoes.ajuda("clientes_novos"),
     serie=mensal["clientes_novos"], key="spark_novos",
 )
 ui.stat_tile(
     c3, "Ticket Médio por Cliente",
     ui.fmt_moeda(mensal["faturamento"].sum() / mensal["clientes_ativos"].sum(), 2),
+    ajuda=definicoes.ajuda("ticket_medio_cliente"),
     serie=mensal["ticket_medio_cliente"], key="spark_ticket_cli",
 )
 ui.stat_tile(
     c4, "Receita no Top 10% de clientes",
     ui.fmt_pct(top10["pct_receita_top10"].iloc[0]),
+    ajuda=definicoes.ajuda("receita_top10"),
 )
 with c4:
     st.caption("Base completa de vendas concretizadas; não reage aos filtros.")
@@ -87,6 +92,11 @@ with aba_seg:
     )
     with col_esq:
         st.plotly_chart(fig, width="stretch", key="rfm_heatmap", config=ui.CONFIG_GRAFICO)
+        ui.leitura(
+            "A massa fica nos extremos da diagonal: 55 clientes em R5 F5 e 39 em R1 F1. "
+            "Cada faixa tem 116 clientes por construção do NTILE(5), que reparte "
+            "empates de frequência entre faixas vizinhas."
+        )
         ui.gemeo_tabular(
             grade.reset_index().rename(columns={"score_f": "score_f \\ score_r"})
         )
@@ -106,6 +116,10 @@ with aba_seg:
     fig.update_layout(title="Clientes por segmento RFM", height=420)
     with col_dir:
         st.plotly_chart(fig, width="stretch", key="rfm_segmentos", config=ui.CONFIG_GRAFICO)
+        ui.leitura(
+            "Campeões, com 135 clientes, é o maior grupo. Somados a Em Risco (105) e "
+            "Perdidos (39), os três segmentos acionáveis cobrem 279 dos 580 clientes."
+        )
         ui.gemeo_tabular(seg.sort_values("clientes", ascending=False).reset_index())
 
     fig = go.Figure(
@@ -119,6 +133,11 @@ with aba_seg:
     col_esq2, col_dir2 = st.columns(2)
     with col_esq2:
         st.plotly_chart(fig, width="stretch", key="rfm_receita", config=ui.CONFIG_GRAFICO)
+        ui.leitura(
+            "A ordem por receita não é a ordem por tamanho. Leais são 39 clientes e "
+            "rendem R$ 656 mil; Em Risco são 105 e rendem R$ 566 mil. Campeões, "
+            "sozinhos, valem quase metade da receita da base."
+        )
         ui.gemeo_tabular(
             seg.sort_values("receita", ascending=False).reset_index()[
                 ["segmento", "receita"]
@@ -157,6 +176,11 @@ with aba_seg:
     )
     with col_dir2:
         st.plotly_chart(fig, width="stretch", key="rfm_dispersao", config=ui.CONFIG_GRAFICO)
+        ui.leitura(
+            "Os 105 Em Risco ficam à direita e no alto: já gastaram bem e pararam de "
+            "comprar. É dinheiro parado, e o melhor retorno esperado de uma campanha "
+            "de reativação."
+        )
         ui.gemeo_tabular(rfm)
 
 
@@ -188,6 +212,11 @@ with aba_ret:
         height=560,
     )
     st.plotly_chart(fig, width="stretch", key="coorte_heatmap", config=ui.CONFIG_GRAFICO)
+    ui.leitura(
+        "A queda inteira acontece no primeiro mês: nas 24 coortes ela vai de 17,6% a "
+        "55,6% de retenção. Depois disso as linhas descem devagar, e comparar coortes "
+        "passa a ser a leitura útil."
+    )
     ui.gemeo_tabular(coorte)
 
     fig = go.Figure(
@@ -203,4 +232,8 @@ with aba_ret:
         height=380,
     )
     st.plotly_chart(fig, width="stretch", key="curva_retencao", config=ui.CONFIG_GRAFICO)
+    ui.leitura(
+        "A média cai de 100% para 34,5% no primeiro mês, fica perto de 30% até o "
+        "quarto e desce abaixo de 20% a partir do sétimo. Reativar exige agir cedo."
+    )
     ui.gemeo_tabular(curva)

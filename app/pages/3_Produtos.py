@@ -8,6 +8,7 @@ from plotly.subplots import make_subplots
 st.set_page_config(page_title="InsightFlow - Produtos", layout="wide")
 
 import dados
+import definicoes
 import filtros
 import theme
 import ui
@@ -36,13 +37,23 @@ n_top20 = max(1, round(0.2 * len(pareto)))
 concentracao = pareto.loc[pareto["posicao"] == n_top20, "pct_acumulado"].iloc[0]
 
 c1, c2, c3, c4 = st.columns(4)
-ui.stat_tile(c1, "SKUs ativos no recorte", ui.fmt_num(vendas["nome_produto"].nunique()))
-ui.stat_tile(c2, "Categoria líder no recorte", por_categoria.idxmax())
-ui.stat_tile(c3, "Produto líder (base completa)", pareto.iloc[0]["produto"])
+ui.stat_tile(
+    c1, "SKUs ativos no recorte", ui.fmt_num(vendas["nome_produto"].nunique()),
+    ajuda=definicoes.ajuda("skus_ativos"),
+)
+ui.stat_tile(
+    c2, "Categoria líder no recorte", por_categoria.idxmax(),
+    ajuda=definicoes.ajuda("categoria_lider"),
+)
+ui.stat_tile(
+    c3, "Produto líder (base completa)", pareto.iloc[0]["produto"],
+    ajuda=definicoes.ajuda("produto_lider"),
+)
 ui.stat_tile(
     c4,
     f"Concentração: top 20% dos produtos ({n_top20} SKUs)",
     ui.fmt_pct(concentracao),
+    ajuda=definicoes.ajuda("concentracao_top20"),
 )
 
 
@@ -74,6 +85,10 @@ fig.update_layout(
 )
 fig.update_xaxes(tickangle=-45)
 st.plotly_chart(fig, width="stretch", key="pareto", config=ui.CONFIG_GRAFICO)
+ui.leitura(
+    "8 dos 30 SKUs pagam 80% do faturamento, e o Notebook Gamer sozinho responde por "
+    "22,6%. Concentração assim é risco operacional, não só foco comercial."
+)
 ui.gemeo_tabular(pareto)
 
 
@@ -106,7 +121,14 @@ if categorias:
     fig.update_xaxes(**ui.eixo_mes(cresc["ano_mes"], passo=6, como_data=True))
     fig.update_annotations(font=dict(size=12, color=theme.TINTA_SECUNDARIA))
     st.plotly_chart(fig, width="stretch", key="mom_categorias", config=ui.CONFIG_GRAFICO)
+    ui.leitura(
+        "Um painel por categoria na mesma escala Y, em vez de linhas sobrepostas: "
+        "acima de três séries a cor deixa de distinguir. MoM sobre base pequena "
+        "oscila muito, então leia a forma e não o ponto."
+    )
     ui.gemeo_tabular(cresc)
+else:
+    st.caption("O recorte não tem meses suficientes para calcular crescimento MoM.")
 
 
 # ---- Matriz crescimento x faturamento ---------------------------------------
@@ -151,4 +173,9 @@ fig.update_layout(
     hoverdistance=24,
 )
 st.plotly_chart(fig, width="stretch", key="matriz_produtos", config=ui.CONFIG_GRAFICO)
+ui.leitura(
+    "Leia por quadrante: faturamento alto com crescimento negativo, à direita e "
+    "abaixo do zero, é o caso que exige ação. Alto e crescendo é o que precisa de "
+    "estoque garantido."
+)
 ui.gemeo_tabular(prod_met)

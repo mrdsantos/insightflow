@@ -7,6 +7,7 @@ import streamlit as st
 st.set_page_config(page_title="InsightFlow - Previsão", layout="wide")
 
 import dados
+import definicoes
 import filtros
 import theme
 import ui
@@ -38,10 +39,14 @@ reg = met[met["modelo"] == "regressao"].iloc[0]
 proximo = futuro.iloc[0]
 c1, c2, c3, c4 = st.columns(4)
 ui.stat_tile(c1, f"Previsão para {ui.rotulo_mes(proximo['ano_mes'])}",
-             ui.fmt_compacto(proximo["previsto"]))
-ui.stat_tile(c2, "MAE da regressão (teste)", ui.fmt_compacto(reg["mae"]))
-ui.stat_tile(c3, "MAPE da regressão (teste)", ui.fmt_pct(reg["mape"]))
-ui.stat_tile(c4, "R2 da regressão (teste)", ui.fmt_num(reg["r2"], 2))
+             ui.fmt_compacto(proximo["previsto"]),
+             ajuda=definicoes.ajuda("previsao_proximo_mes"))
+ui.stat_tile(c2, "MAE da regressão (teste)", ui.fmt_compacto(reg["mae"]),
+             ajuda=definicoes.ajuda("mae_regressao"))
+ui.stat_tile(c3, "MAPE da regressão (teste)", ui.fmt_pct(reg["mape"]),
+             ajuda=definicoes.ajuda("mape_regressao"))
+ui.stat_tile(c4, "R2 da regressão (teste)", ui.fmt_num(reg["r2"], 2),
+             ajuda=definicoes.ajuda("r2_regressao"))
 st.caption(
     f"Banda da previsão: {ui.fmt_compacto(proximo['banda_inf'])} a "
     f"{ui.fmt_compacto(proximo['banda_sup'])} (1,96 desvios do resíduo de teste). "

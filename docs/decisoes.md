@@ -156,6 +156,29 @@ view nova que ficasse de fora da lista seria ignorada em silêncio, falha pior q
 que ao menos estourava. `tests/test_ordem_views.py` lê os arquivos na mesma ordem do migrate
 e falha se alguma view referenciar outra ainda não criada.
 
+## Quinta página, reabrindo o teto de quatro telas do plano
+
+O plano de produção fixou quatro telas nomeadas (Visão Geral, Clientes, Produtos, Previsão) e
+nenhuma outra. Reabri essa decisão e aprovei uma quinta página, `Definições`. O motivo não é
+querer mais tela: é que os números não se autoexplicam para quem abre o link público sem
+contexto. O tile de churn não diz que a janela é de 90 dias, e os dez segmentos nomeados pelo
+RFM aparecem nos gráficos sem que nada na tela diga que combinação de recência e frequência
+define "Não pode perder" ou "Prestes a dormir". A definição existe, mas mora no README e nas
+views - ou seja, exige sair do dashboard.
+
+O teto de quatro telas era um artefato de planejamento, não um achado de usabilidade, e
+planejamento se ajusta ao produto, não o contrário. O que não entrou foi a ideia de uma tela
+de onboarding ensinando a usar os filtros: dashboard de quatro páginas com sidebar visível não
+precisa de tutorial, e aba de glossário é, na prática, a página menos visitada de qualquer
+dashboard. Por isso a quinta página é referência auditável (definição de cada KPI, a grade dos
+dez segmentos RFM, limitações conhecidas), em tabela e não em prosa, e o peso da compreensão
+fica na adjacência: tooltip em cada KPI e uma frase de leitura junto de cada gráfico. É o mesmo
+princípio da descrição de medida do Power BI e do campo de legenda do Tableau - a definição
+precisa estar ao lado do número, porque ninguém interrompe a leitura para ir procurá-la.
+
+Se eu mudasse de ideia, o que sairia primeiro é a página, não os tooltips: eles carregam a
+parte que de fato é lida.
+
 ## Título ancorado no container, faixa superior de 76px
 
 Com `margin.t = 48`, o título (que por padrão se centra no meio da margem superior) e a legenda

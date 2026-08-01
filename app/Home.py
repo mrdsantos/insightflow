@@ -6,11 +6,16 @@ import streamlit as st
 st.set_page_config(page_title="InsightFlow - Visão Geral", layout="wide")
 
 import dados
+import definicoes
 import filtros
 import theme
 import ui
 
 st.title("Como o negócio está performando e para onde está indo?")
+st.caption(
+    "Painel de vendas de um e-commerce simulado, do faturamento ao modelo de previsão. "
+    "A definição de cada número está na página Definições, na barra lateral."
+)
 
 op = filtros.opcoes()
 sel = filtros.sidebar(op)
@@ -56,6 +61,7 @@ c1, c2, c3, c4 = st.columns(4)
 d = deltas["fat"]
 ui.stat_tile(
     c1, "Faturamento Total", ui.fmt_compacto(fat_atual),
+    ajuda=definicoes.ajuda("faturamento_total"),
     serie=mensal["faturamento"], key="spark_fat",
     delta_texto=None if d is None else ui.fmt_pct(abs(d)),
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
@@ -63,6 +69,7 @@ ui.stat_tile(
 d = deltas["ticket"]
 ui.stat_tile(
     c2, "Ticket Médio", ui.fmt_moeda(ticket_atual, 2),
+    ajuda=definicoes.ajuda("ticket_medio"),
     serie=mensal["ticket_medio"], key="spark_ticket",
     delta_texto=None if d is None else ui.fmt_pct(abs(d)),
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
@@ -70,6 +77,7 @@ ui.stat_tile(
 d = deltas["ret"]
 ui.stat_tile(
     c3, "Taxa de Retenção", ui.fmt_pct(ret_atual),
+    ajuda=definicoes.ajuda("taxa_retencao"),
     serie=mensal["taxa_retencao"], key="spark_ret",
     delta_texto=None if d is None else f"{ui.fmt_num(abs(d), 1)} p.p.",
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
@@ -77,6 +85,7 @@ ui.stat_tile(
 d = deltas["churn"]
 ui.stat_tile(
     c4, "Churn Rate", ui.fmt_pct(churn_atual),
+    ajuda=definicoes.ajuda("churn_rate"),
     serie=mensal["churn_rate"], key="spark_churn",
     delta_texto=None if d is None else f"{ui.fmt_num(abs(d), 1)} p.p.",
     subiu=d is not None and d >= 0, bom=d is not None and d <= 0,
@@ -103,6 +112,17 @@ fig.add_scatter(
 fig.update_layout(title="Faturamento mensal", height=380)
 fig.update_xaxes(type="category", **ui.eixo_mes(serie["ano_mes"], passo=2))
 st.plotly_chart(fig, width="stretch", key="serie_mensal", config=ui.CONFIG_GRAFICO)
+if len(serie) < 2:
+    texto = "Recorte de um único mês; não há série para comparar pico e média."
+else:
+    pico = serie.loc[serie["faturamento"].idxmax()]
+    acima = 100 * pico["faturamento"] / serie["faturamento"].mean() - 100
+    texto = (
+        f"O pico do recorte é {ui.rotulo_mes(pico['ano_mes'])}, com "
+        f"{ui.fmt_compacto(pico['faturamento'])}, {ui.fmt_pct(acima)} acima da média "
+        "mensal. O crescimento vem em degraus de patamar, não em rampa."
+    )
+ui.leitura(texto)
 ui.gemeo_tabular(serie)
 
 
@@ -125,6 +145,24 @@ fig.update_layout(title="Sazonalidade ano a ano", height=380)
 fig.update_xaxes(categoryorder="array", categoryarray=ui.MESES)
 with col_esq:
     st.plotly_chart(fig, width="stretch", key="sazonalidade", config=ui.CONFIG_GRAFICO)
+    if len(anos) < 2 or fat["ano_mes"].nunique() < 12:
+        texto = (
+            "Recorte curto para sazonalidade: a forma que se repete só aparece com "
+            "pelo menos dois ciclos completos de doze meses."
+        )
+    else:
+        por_mes = saz.groupby("mes", as_index=False)["faturamento"].sum()
+        alto = por_mes.loc[por_mes["faturamento"].idxmax()]
+        baixo = por_mes.loc[por_mes["faturamento"].idxmin()]
+        mes_alto = ui.MESES[int(alto["mes"]) - 1]
+        mes_baixo = ui.MESES[int(baixo["mes"]) - 1]
+        vezes = ui.fmt_num(alto["faturamento"] / baixo["faturamento"], 1)
+        texto = (
+            f"O melhor mês do calendário é {mes_alto} e o pior é {mes_baixo}, e "
+            f"{mes_alto} soma {vezes} vezes o faturamento de {mes_baixo}. "
+            "O mês de pico é evento de calendário, não patamar novo."
+        )
+    ui.leitura(texto)
     ui.gemeo_tabular(saz)
 
 
@@ -143,4 +181,18 @@ fig = go.Figure(
 fig.update_layout(title="Faturamento por categoria", height=380)
 with col_dir:
     st.plotly_chart(fig, width="stretch", key="categorias", config=ui.CONFIG_GRAFICO)
+    if len(cat) < 2:
+        texto = "Uma única categoria no recorte; não há concentração a comparar."
+    else:
+        # cat esta ordenado ascendente: a lider e a ultima linha, nao a primeira
+        lider = cat.iloc[-1]
+        pct = 100 * lider["faturamento"] / cat["faturamento"].sum()
+        acum = cat["faturamento"].iloc[:-1].cumsum().to_numpy()
+        abertura = f"{lider['categoria']} responde por {ui.fmt_pct(pct)} do faturamento"
+        if acum[-1] >= lider["faturamento"]:
+            n = int((acum < lider["faturamento"]).sum()) + 1
+            texto = f"{abertura} do recorte, o mesmo que as {n} menores categorias somadas."
+        else:
+            texto = f"{abertura} do recorte, mais do que todas as outras somadas."
+    ui.leitura(texto)
     ui.gemeo_tabular(cat.sort_values("faturamento", ascending=False))

@@ -4,7 +4,9 @@ Tabela que liga cada elemento de tela do dashboard à view SQL que o alimenta. R
 impõe: nenhuma view fora desta tabela será construída (view órfã) e nenhum elemento de tela
 fica sem fonte. O app só aplica filtro (WHERE) e agregação trivial (soma, contagem, pivot);
 toda lógica analítica (janelas, quintis, percentuais acumulados, definição de churn) vive nas
-views versionadas em `sql/views/`.
+views versionadas em `sql/views/`. Página cujo conteúdo é de referência, e não consulta ao
+banco, declara a fonte documental na coluna de view em vez de uma view — a regra de nenhuma
+view órfã e nenhum elemento sem fonte continua valendo inteira.
 
 | Página | Elemento | View / query | Granularidade | Colunas retornadas |
 |---|---|---|---|---|
@@ -25,6 +27,8 @@ views versionadas em `sql/views/`.
 | 4 Previsão | Linha de KPIs | `vw_previsao` + `vw_metricas_modelo` | mês / modelo | ver views |
 | 4 | Histórico + ajuste + projeção tracejada | `vw_previsao` | mês | ano_mes, realizado, ajustado, previsto, banda_inf, banda_sup, fase |
 | 4 | Tabela modelo vs baseline | `vw_metricas_modelo` | modelo | modelo, mae, mape, r2 |
+| 5 Definições | Abertura, tabela de KPIs, tabela dos 10 segmentos RFM, limitações | sem view: página de texto, fonte documental em `app/definicoes.py`, derivada de `sql/views/006_vw_rfm.sql` e `docs/decisoes.md` | — | — |
+| 5 | Sidebar de filtros (renderizada, não aplicada) | `vw_vendas` (mesma leitura das demais páginas, via `filtros.opcoes()`) | item | ver view |
 | todas | Gêmeo tabular (expander de cada gráfico) | a mesma view do gráfico | — | — |
 | todas | Filtros da sidebar (opções) | `vw_vendas` (valores distintos de categoria, uf, status; min/max de data) | item | ver view |
 
