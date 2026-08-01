@@ -46,6 +46,9 @@ EIXO = "#c3c2b7"
 
 FONTE = "system-ui, -apple-system, 'Segoe UI', sans-serif"
 
+# Fundo transparente para sparklines embutidos em cards.
+TRANSPARENTE = "rgba(0,0,0,0)"
+
 _eixo_padrao = dict(
     showgrid=True,
     gridcolor=GRADE,
