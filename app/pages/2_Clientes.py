@@ -51,6 +51,8 @@ ui.stat_tile(
     c4, "Receita no Top 10% de clientes",
     ui.fmt_pct(top10["pct_receita_top10"].iloc[0]),
 )
+with c4:
+    st.caption("Base completa de vendas concretizadas; nao reage aos filtros.")
 
 aba_seg, aba_ret = st.tabs(["Segmentacao", "Retencao"])
 

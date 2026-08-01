@@ -114,13 +114,15 @@ ui.gemeo_tabular(serie)
 col_esq, col_dir = st.columns(2)
 
 saz = fat.groupby(["ano", "mes"], as_index=False)["faturamento"].sum()
+# teto de 3 series coloridas: com mais anos no recorte, mostra os 3 ultimos
+anos = sorted(saz["ano"].unique())[-3:]
 fig = go.Figure()
-for i, ano in enumerate(sorted(saz["ano"].unique())):
+for i, ano in enumerate(anos):
     d = saz[saz["ano"] == ano].sort_values("mes")
     fig.add_scatter(
         x=[MESES[m - 1] for m in d["mes"]], y=d["faturamento"],
         mode="lines", name=str(ano),
-        line=dict(color=theme.SLOTS[i % len(theme.SLOTS)], width=2),
+        line=dict(color=theme.SLOTS[i], width=2),
     )
 fig.update_layout(title="Sazonalidade ano a ano", height=380)
 fig.update_xaxes(categoryorder="array", categoryarray=MESES)

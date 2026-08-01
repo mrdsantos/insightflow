@@ -9,7 +9,7 @@ views versionadas em `sql/views/`.
 | Pagina | Elemento | View / query | Granularidade | Colunas retornadas |
 |---|---|---|---|---|
 | 1 Visao Geral | Linha de 4 KPIs + deltas + sparklines | `vw_kpis_mensais` | mes | ano_mes, faturamento, pedidos, ticket_medio, clientes_ativos, clientes_novos, ticket_medio_cliente, taxa_retencao, churn_rate |
-| 1 | Serie temporal de faturamento | `vw_faturamento_mensal` | mes x categoria x uf x status | ano_mes, categoria, uf, status, faturamento, itens |
+| 1 | Serie temporal de faturamento | `vw_faturamento_mensal` | mes x categoria x uf x status | ano_mes, ano, mes, categoria, uf, status, faturamento, itens |
 | 1 | Sazonalidade ano a ano | `vw_faturamento_mensal` (app separa por ano) | idem | idem |
 | 1 | Barras por categoria (cor unica) | `vw_faturamento_mensal` (app agrega) | idem | idem |
 | 2 Clientes | Linha de KPIs | `vw_kpis_mensais` + `vw_receita_top_clientes` | mes / 1 linha | (acima) / pct_receita_top10 |
