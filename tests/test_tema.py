@@ -1,9 +1,10 @@
 """Guardas do tema, sem banco e sem navegador.
 
-Tres coisas que quebram em silencio quando alguem mexe em cor: o config.toml sair
-de sincronia com app/theme.py (TOML nao le Python, entao os hex estao duplicados
-de proposito), o `pio.templates.default` voltar - ele e do processo e o tema e da
-sessao -, e uma cor solta aparecer fora do theme.py.
+Coisas que quebram em silencio quando alguem mexe em tema: o config.toml sair de
+sincronia com app/theme.py (TOML nao le Python, entao os hex estao duplicados de
+proposito), o `pio.templates.default` voltar - ele e do processo e o tema e da
+sessao -, uma cor solta aparecer fora do theme.py, e o Python voltar a decidir o
+modo por conta propria em vez de perguntar ao frontend.
 """
 
 import re
@@ -80,14 +81,34 @@ def test_config_toml_espelha_o_theme_py(secao, paleta, pares):
         )
 
 
-def test_nao_existe_theme_light_no_config():
-    """Declarar os dois lados faz o Streamlit montar um "Custom Theme Auto".
+@pytest.mark.parametrize(
+    "tipo,esperado", [("dark", "escuro"), ("light", "claro"), (None, "claro")]
+)
+def test_paleta_segue_o_frontend(tipo, esperado, modo_do_frontend):
+    """Quem decide o modo e o frontend; o Python so pergunta qual saiu.
 
-    Auto segue o tema do sistema operacional, e o dashboard tem que abrir claro
-    independente do sistema. Sem [theme.light], o carregamento sem parametro cai
-    no [theme], que e o claro.
+    Enquanto o theme.py decidia sozinho, uma URL sem `embed_options` deixava o
+    chrome escuro (o "Custom Theme Auto" do Streamlit segue o sistema) e o grafico
+    claro. Sem navegador do outro lado, `type` e None e vale o claro.
     """
-    assert "light" not in CONFIG["theme"]
+    modo_do_frontend(tipo)
+    assert theme.paleta().MODO == esperado
+
+
+def test_toggle_declara_embed_options_nos_dois_sentidos():
+    """Sem `embed_options` o frontend cai no Auto e segue o sistema operacional.
+
+    Era o que fazia o "Tema claro" nao voltar em quem estava com o sistema no
+    escuro. O `tema=` proprio saiu junto: o frontend nunca o leu.
+    """
+    sys.path.insert(0, str(RAIZ / "app"))
+    import filtros  # noqa: PLC0415  (mesmo import plano das paginas)
+
+    assert set(filtros.DESTINO_TEMA) == set(theme.MODOS)
+    for destino in filtros.DESTINO_TEMA.values():
+        assert "embed_options=" in destino
+        assert "tema=" not in destino
+    assert filtros.DESTINO_TEMA["claro"] != filtros.DESTINO_TEMA["escuro"]
 
 
 COR = re.compile(r"#[0-9a-fA-F]{6}\b|\brgba?\(")
