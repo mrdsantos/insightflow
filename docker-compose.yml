@@ -1,0 +1,33 @@
+# Sobe banco, migra, roda o ETL e serve o dashboard com um unico comando:
+#   docker compose up --build
+# Pensado para o avaliador; o desenvolvimento local usa Postgres nativo e venv.
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: insightflow
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d insightflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/insightflow
+    ports:
+      - "8501:8501"
+    command: >
+      sh -c "python scripts/migrate.py
+             && python -m src.etl.pipeline
+             && streamlit run app/Home.py --server.port=8501 --server.address=0.0.0.0"
+
+volumes:
+  pgdata:
