@@ -27,6 +27,7 @@ services:
     command: >
       sh -c "python scripts/migrate.py
              && python -m src.etl.pipeline
+             && python -m src.modelo.treinar
              && streamlit run app/Home.py --server.port=8501 --server.address=0.0.0.0"
 
 volumes:
