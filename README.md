@@ -56,10 +56,12 @@ viram views com window functions: RFM por `NTILE(5)`, retenção por coorte, Par
 acumulado, crescimento MoM/YoY por `LAG`. Definições que exigiram decisão (venda
 concretizada, churn de 90 dias) estão em [docs/decisoes.md](docs/decisoes.md).
 
-**Dashboard (Sprint 3).** Quatro páginas orientadas à pergunta de negócio, filtros
+**Dashboard (Sprint 3).** Cinco páginas orientadas à pergunta de negócio, filtros
 globais na sidebar com estado preservado entre páginas, paleta única validada em
 `app/theme.py`, todo gráfico com gêmeo tabular. Sem eixo duplo; o único tracejado do
-projeto é a projeção do modelo, onde tracejado significa projeção.
+projeto é a projeção do modelo, onde tracejado significa projeção. A definição fica ao
+lado do número: cada KPI tem tooltip e cada gráfico tem uma frase de leitura abaixo,
+com a referência completa na página Definições.
 
 **Modelo (Sprint 4).** Série mensal de faturamento, split temporal (18 meses de treino,
 6 de teste), baseline de média móvel de 3 meses contra regressão linear com tendência e
@@ -106,8 +108,9 @@ sql/ddl/          esquemas, dimensoes, fato, quarentena, tabelas do modelo
 sql/views/        12 views consumidas pelo dashboard, prefixadas na ordem de dependencia
 sql/consultas/    SQL de apoio dos notebooks
 notebooks/        01 qualidade, 02 EDA, 03 modelo
-app/              Streamlit multipagina (theme, dados, filtros, ui, paginas)
-tests/            pytest das funcoes puras de limpeza e da ordem das views
+app/              Streamlit multipagina (theme, dados, filtros, ui, definicoes, paginas)
+tests/            pytest das funcoes puras de limpeza, da ordem das views, do modulo
+                  de definicoes e smoke de renderizacao das paginas
 docs/             decisoes, storytelling, rastreabilidade, contrato de dados
 dados/            ecom_data.csv commitado
 ```
@@ -122,7 +125,7 @@ arquivo e evidência de cada item, está em
 |---|---|
 | 1 - Ingestão e ETL | `src/etl/`, `scripts/migrate.py`, `sql/ddl/`, notebook 01 |
 | 2 - EDA e SQL | notebook 02, `sql/views/`, `sql/consultas/` |
-| 3 - Dashboard | `app/` (4 páginas, KPIs, sazonalidade, filtros dinâmicos) |
+| 3 - Dashboard | `app/` (5 páginas, KPIs, sazonalidade, filtros dinâmicos) |
 | 4 - Storytelling e modelo | notebook 03, `src/modelo/`, `docs/storytelling.md` |
 
 ## Além do escopo

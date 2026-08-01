@@ -40,6 +40,7 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 | Entrega 4: link público do dashboard | Publicado em https://insightflow.maiconsantos.com.br/ via Dokploy (Docker Swarm), imagem construída pelo `Dockerfile`; link no topo do README | ok |
 | `st.cache_data` nas queries (requisito do plano) | `app/dados.py`: `ler_view` com `st.cache_data(ttl=600)` e engine única via `st.cache_resource` | ok |
 | Página Previsão | `app/pages/4_Previsão.py` completa na Sprint 4: KPIs, histórico + ajuste + projeção tracejada com banda, tabela modelo vs baseline, leitura do resultado | ok |
+| Explicabilidade dos números na própria tela | `app/definicoes.py` como fonte única do texto; tooltip nos 16 tiles de KPI, frase de leitura sob os 12 gráficos das páginas 1 a 3, e a página `app/pages/5_Definições.py` com definição de cada KPI, a grade dos 10 segmentos RFM e as limitações conhecidas. Motivo em `docs/decisoes.md`, seção "Quinta página, reabrindo o teto de quatro telas do plano"; guardado por `tests/test_definicoes.py` e `tests/test_paginas.py` | ok |
 
 ## Sprint 4 - Storytelling e Modelo Preditivo
 
@@ -66,5 +67,5 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 |---|---|
 | Qualidade do ETL (30%) | `src/etl/` (validação com quarentena por motivo, limpeza multiformato, full refresh idempotente), `sql/ddl/` (star schema com PKs, FKs, índices), `docs/relatorio_qualidade.md`, `tests/test_limpeza.py`, `tests/test_ordem_views.py` (valida estaticamente a ordem das views, sem banco) |
 | Análise de Dados (35%) | Notebooks 01-03; window functions em `sql/views/` (LAG, NTILE, SUM OVER, FILTER); correlação e outliers com escolha justificada; RFM, coorte e churn definidos a partir dos dados; modelo com baseline e leitura crítica |
-| Visualização (25%) | `app/`: 4 páginas orientadas à pergunta, KPIs do enunciado, séries com sazonalidade, filtros globais persistentes, paleta única validada, gêmeo tabular em todo gráfico, sem eixo duplo |
-| Documentação (10%) | `README.md`, `docs/storytelling.md`, `docs/decisoes.md`, `docs/contrato-dados.md`, este arquivo |
+| Visualização (25%) | `app/`: 5 páginas orientadas à pergunta, KPIs do enunciado, séries com sazonalidade, filtros globais persistentes, paleta única validada, gêmeo tabular em todo gráfico, sem eixo duplo; explicabilidade na própria tela (tooltip em cada KPI, frase de leitura sob cada gráfico, página Definições) |
+| Documentação (10%) | `README.md`, `docs/storytelling.md`, `docs/decisoes.md`, `docs/contrato-dados.md`, este arquivo, e a documentação dentro do produto: `app/definicoes.py` alimentando os tooltips e a página Definições |
