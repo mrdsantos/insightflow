@@ -122,6 +122,17 @@ pivot). Janelas, quintis, percentuais acumulados e a definicao de churn vivem na
 versionadas em `sql/views/`. Se um numero do dashboard divergir do SQL, o erro e do app,
 nao da analise - e a view continua auditavel por quem nunca abriu o Python.
 
+## Projecao usa a regressao mesmo com o baseline ganhando no teste
+
+No split temporal (treino ate dez/2025, teste jan-jun/2026) a media movel de 3 meses
+bateu a regressao por pouco: MAE 46,3k contra 51,9k, MAPE 18,9% contra 19,8%, R2 negativo
+nos dois. Publiquei os numeros como sao - a tabela da pagina de Previsao mostra o baseline
+vencendo. A projecao de jul-dez/2026, porem, sai da regressao: media movel realimentada
+para frente converge para uma reta e nunca anteciparia o pico de novembro, que e o evento
+mais importante do ano; a regressao carrega a dummy de novembro. Diferenca de 12% no MAE,
+medida em 6 observacoes, nao justifica descartar o unico modelo com estrutura sazonal.
+Analise completa no notebook 03.
+
 ## Seed fixa no gerador
 
 `random.Random(SEED)` com seed constante no codigo. Duas execucoes geram o mesmo CSV

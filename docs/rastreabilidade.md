@@ -39,8 +39,32 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 | Ferramenta de BI: bibliotecas Python (Streamlit/Dash) aceitas pelo enunciado | Streamlit + Plotly; corte do Power BI justificado em `docs/decisoes.md`. Tema e paleta centralizados em `app/theme.py` e `.streamlit/config.toml` | ok |
 | Entrega 4: link publico do dashboard | Dockerfile e docker-compose.yml prontos; deploy no Dokploy agendado (nao bloqueia o bloco 4) | parcial |
 | `st.cache_data` nas queries (requisito do plano) | `app/dados.py`: `ler_view` com `st.cache_data(ttl=600)` e engine unica via `st.cache_resource` | ok |
-| Pagina Previsao | Esqueleto em `app/pages/4_Previsao.py`; conteudo e entrega da Sprint 4 (consome saida do modelo) | parcial |
+| Pagina Previsao | `app/pages/4_Previsao.py` completa na Sprint 4: KPIs, historico + ajuste + projecao tracejada com banda, tabela modelo vs baseline, leitura do resultado | ok |
 
 ## Sprint 4 - Storytelling e Modelo Preditivo
 
-Pendente - inicia no bloco 4.
+| Requisito | Entrega | Status |
+|---|---|---|
+| 1. Modelo simples de Regressao Linear ou similar para previsao de vendas | `notebooks/03_modelo.ipynb`: regressao linear (tendencia + dummies de mes) contra baseline de media movel 3m, split temporal (18 meses treino, 6 teste), MAE/MAPE/R2 dos dois; `src/modelo/treinar.py` replica o notebook e materializa `dw.previsao_mensal` e `dw.metricas_modelo`, lidas por `dw.vw_previsao` e `dw.vw_metricas_modelo` | ok |
+| 2. Documentar insights por storytelling analitico | `docs/storytelling.md`: narrativa em 5 atos (crescimento em degraus, Black Friday, concentracao, segmentos RFM acionaveis, previsao com limites), cada um apontando a pagina do dashboard; fecha com recomendacoes | ok |
+| 3. README final com metodologia, instrucoes e resultados | `README.md`: resultados em numeros, arquitetura, metodologia por sprint, execucao local (venv) e Docker, escopo do desafio e alem do escopo | ok |
+| Pergunta de negocio: e possivel prever vendas/faturamento do proximo mes? | Sim, como ordem de grandeza: jul/2026 ~R$ 321 mil, banda 207-435 mil. Resposta honesta sobre a confianca (R2 negativo no teste, baseline competitivo) na pagina Previsao, notebook 03 e `docs/decisoes.md` | ok |
+
+## Entrega final (secao Entrega do enunciado)
+
+| Item | Entrega | Status |
+|---|---|---|
+| 1. Repositorio no GitHub | `github.com/mrdsantos/insightflow`, publico, com PRs e milestones por sprint | ok |
+| 2. Scripts e notebooks das Sprints 1, 2 e 4 | `src/`, `scripts/`, `sql/`, `notebooks/01`, `02`, `03` | ok |
+| 3. requirements.txt e instrucoes de execucao | `requirements.txt` (versoes pinadas) + secao Como executar do README | ok |
+| 4. Link publico ou dashboard local | Dashboard local via venv ou `docker compose up --build`; link publico via Dokploy | parcial |
+| 5. Dados: CSV e script de geracao | `dados/ecom_data.csv` commitado + `src/gerador/gerar_dados.py` com seed fixa | ok |
+
+## Criterios de avaliacao
+
+| Criterio (peso) | Onde esta a evidencia |
+|---|---|
+| Qualidade do ETL (30%) | `src/etl/` (validacao com quarentena por motivo, limpeza multiformato, full refresh idempotente), `sql/ddl/` (star schema com PKs, FKs, indices), `docs/relatorio_qualidade.md`, `tests/test_limpeza.py` |
+| Analise de Dados (35%) | Notebooks 01-03; window functions em `sql/views/` (LAG, NTILE, SUM OVER, FILTER); correlacao e outliers com escolha justificada; RFM, coorte e churn definidos a partir dos dados; modelo com baseline e leitura critica |
+| Visualizacao (25%) | `app/`: 4 paginas orientadas a pergunta, KPIs do enunciado, series com sazonalidade, filtros globais persistentes, paleta unica validada, gemeo tabular em todo grafico, sem eixo duplo |
+| Documentacao (10%) | `README.md`, `docs/storytelling.md`, `docs/decisoes.md`, `docs/contrato-dados.md`, este arquivo |
