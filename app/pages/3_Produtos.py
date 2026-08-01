@@ -85,6 +85,10 @@ fig.update_layout(
 )
 fig.update_xaxes(tickangle=-45)
 st.plotly_chart(fig, width="stretch", key="pareto", config=ui.CONFIG_GRAFICO)
+ui.leitura(
+    "8 dos 30 SKUs pagam 80% do faturamento, e o Notebook Gamer sozinho responde por "
+    "22,6%. Concentração assim é risco operacional, não só foco comercial."
+)
 ui.gemeo_tabular(pareto)
 
 
@@ -117,7 +121,14 @@ if categorias:
     fig.update_xaxes(**ui.eixo_mes(cresc["ano_mes"], passo=6, como_data=True))
     fig.update_annotations(font=dict(size=12, color=theme.TINTA_SECUNDARIA))
     st.plotly_chart(fig, width="stretch", key="mom_categorias", config=ui.CONFIG_GRAFICO)
+    ui.leitura(
+        "Um painel por categoria na mesma escala Y, em vez de linhas sobrepostas: "
+        "acima de três séries a cor deixa de distinguir. MoM sobre base pequena "
+        "oscila muito, então leia a forma e não o ponto."
+    )
     ui.gemeo_tabular(cresc)
+else:
+    st.caption("O recorte não tem meses suficientes para calcular crescimento MoM.")
 
 
 # ---- Matriz crescimento x faturamento ---------------------------------------
@@ -162,4 +173,9 @@ fig.update_layout(
     hoverdistance=24,
 )
 st.plotly_chart(fig, width="stretch", key="matriz_produtos", config=ui.CONFIG_GRAFICO)
+ui.leitura(
+    "Leia por quadrante: faturamento alto com crescimento negativo, à direita e "
+    "abaixo do zero, é o caso que exige ação. Alto e crescendo é o que precisa de "
+    "estoque garantido."
+)
 ui.gemeo_tabular(prod_met)
