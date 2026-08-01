@@ -107,13 +107,87 @@ segmento que importa sumiria no meio. Destacar pouco é mais legível e mais afi
 analiticamente. O mesmo princípio vale para a matriz crescimento x faturamento de
 produtos (maior volume, maior crescimento, maior queda).
 
-## Tema claro fixo, sem modo escuro
+## Modo escuro entrou, com claro como padrão (reverte "tema claro fixo")
 
-A paleta foi validada (daltonismo e contraste) contra superfície clara. Modo escuro
-exige uma segunda paleta com passos próprios validados contra a superfície escura - não é
-inversão automática. Fora do escopo desta entrega por decisão, não por esquecimento.
-Toda cor do projeto vive em `app/theme.py` (template Plotly global) e
-`.streamlit/config.toml`; nenhum gráfico declara cor própria.
+Esta decisão substitui a anterior, que era "tema claro fixo, sem modo escuro". O motivo
+original continua correto e não foi contornado: modo escuro exige uma segunda paleta com
+passos próprios validados contra a superfície escura, e não é inversão automática da
+clara. A diferença é que agora essa paleta existe e foi validada, então a condição que
+segurava a decisão foi cumprida em vez de dispensada.
+
+Os passos escuros são os que a paleta de referência documenta para superfície escura, dos
+mesmos matizes. Medições contra `#1a1a19`, pelas mesmas checagens usadas no claro:
+
+| Cenário | Separação sob daltonismo | Piso de visão normal | Contraste |
+|---|---|---|---|
+| Slots 1-4, pares adjacentes (barras, linhas) | ΔE 8,4 | ΔE 19,8 | todos acima de 3:1 |
+| Slots 1-3, todos os pares (dispersão) | ΔE 9,4 | ΔE 20,9 | todos acima de 3:1 |
+
+O alvo de daltonismo é 8 e o piso de visão normal é 15, então os dois cenários passam. O
+escuro passa sem nenhum aviso: os avisos de contraste do projeto (aqua a 2,74:1 e amarelo
+a 2,11:1) existem só no claro, e são cobertos pelo gêmeo tabular, que já é obrigatório
+embaixo de todo gráfico.
+
+Três escolhas que não saíram da tabela de referência e precisam de justificativa própria:
+
+- **Cinza de de-emphasis escuro `#52514e`.** Dá 2,19:1 sobre o fundo escuro, o mesmo grau
+  de recuo que `#c3c2b7` tem sobre o claro (1,75:1), e fica a ΔE 22,5-25,3 das três cores
+  destacadas. O candidato mais claro `#6b6a64` seria mais visível (3,21:1) mas fica a 15,8
+  do aqua, no limite do piso - o cinza começaria a competir com o destaque em vez de ficar
+  atrás dele, que é o oposto do que a decisão de emphasis quer.
+- **A rampa sequencial inverte no escuro.** Quem precisa recuar para o fundo é a ponta
+  escura, não a clara. Isso também faz o passo 0 - usado como preenchimento da banda da
+  previsão - continuar sendo o mais próximo da superfície nos dois modos sem a página
+  saber de nada.
+- **Status virou token por modo.** O delta do KPI é texto pequeno, onde a barra é 4,5:1 e
+  não os 3:1 de marca, e nenhum hex único passa nos dois fundos. Bom: `#006300` no claro
+  (7,35:1) e `#0ca30c` no escuro (5,19:1). Crítico: `#d03b3b` no claro (4,68:1) e
+  `#e66767` no escuro (5,39:1). De quebra isso corrige uma falha que já existia: o claro
+  usava `#0ca30c`, que dá 3,27:1 e reprova para texto.
+
+Toda cor continua vivendo só em `app/theme.py`; nenhum gráfico declara cor própria. O que
+mudou é que `theme.py` deixou de ser um módulo de constantes e passou a resolver a paleta
+por sessão - ver a decisão seguinte.
+
+## O tema é por sessão, então o template do Plotly deixou de ser global
+
+`app/theme.py` registrava o template como efeito colateral de import e o marcava em
+`pio.templates.default`. Módulo Python é cacheado por processo, então constante de módulo
+é global do processo e não da sessão: com dois usuários em modos diferentes no mesmo
+servidor, o primeiro a importar congelaria a paleta do segundo.
+
+Agora `theme.paleta()` devolve a paleta da sessão corrente, os dois templates ficam
+registrados sem nenhum ser o default, e `ui.grafico()` aplica o template por figura. É
+uma chamada a mais por gráfico em troca de não ter estado de cor compartilhado entre
+sessões. `tests/test_tema.py` falha se o default global voltar.
+
+## Trocar de tema recarrega a página e zera os filtros
+
+O Streamlit resolve o tema uma vez, no boot da página, e não expõe API Python para
+trocá-lo em runtime: `st.context.theme` é somente leitura. O único gancho suportado é
+`?embed_options=dark_theme` na URL, que vence tanto o `localStorage` quanto a preferência
+do sistema operacional - e, ao contrário de `show_toolbar` e companhia, não depende de
+`embed=true`, então nada do chrome da página é removido junto. Por isso o toggle é uma
+âncora que navega de verdade, e não um `st.button`: widget só dispara rerun, e rerun não
+recarrega.
+
+A consequência é que a recarga reinicia a sessão e os filtros voltam ao padrão. Preferi
+isso a serializar os seis filtros na query string, porque `app/filtros.py` já estava
+pronto e correto e trocar de tema é ação de uma vez por visita. A sidebar avisa o
+comportamento em vez de escondê-lo.
+
+Um detalhe de implementação que decorre disso: `st.query_params` esconde `embed_options`,
+então o Python não consegue ler o parâmetro que o frontend usa. O toggle carrega um
+`tema=claro|escuro` próprio ao lado, e o valor fica espelhado em `st.session_state`
+porque a navegação entre páginas não leva a query string junto.
+
+## Sem `[theme.light]` no config.toml
+
+O `config.toml` declara `[theme]` (claro, e o padrão) e `[theme.dark]`, mas não um
+`[theme.light]`. Declarar os dois lados faz o Streamlit montar um "Custom Theme Auto", que
+segue o tema do sistema operacional - e o requisito é abrir claro independente do sistema.
+Sem `[theme.light]`, o carregamento sem parâmetro cai no `[theme]` por construção. Por
+isso o link de volta para o claro não passa `embed_options` nenhum.
 
 ## O dashboard não calcula nada em pandas
 

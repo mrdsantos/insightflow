@@ -57,8 +57,8 @@ acumulado, crescimento MoM/YoY por `LAG`. Definições que exigiram decisão (ve
 concretizada, churn de 90 dias) estão em [docs/decisoes.md](docs/decisoes.md).
 
 **Dashboard (Sprint 3).** Cinco páginas orientadas à pergunta de negócio, filtros
-globais na sidebar com estado preservado entre páginas, paleta única validada em
-`app/theme.py`, todo gráfico com gêmeo tabular. Sem eixo duplo; o único tracejado do
+globais na sidebar com estado preservado entre páginas, paleta validada em modo claro e
+escuro em `app/theme.py`, todo gráfico com gêmeo tabular. Sem eixo duplo; o único tracejado do
 projeto é a projeção do modelo, onde tracejado significa projeção. A definição fica ao
 lado do número: cada KPI tem tooltip e cada gráfico tem uma frase de leitura abaixo,
 com a referência completa na página Definições.
@@ -142,3 +142,8 @@ Itens que o enunciado não pede, construídos por decisão própria:
   pedido à base (registrado em [docs/decisoes.md](docs/decisoes.md)).
 - **Registro de decisões**: cada escolha questionável tem seção própria em
   `docs/decisoes.md`, com o porquê.
+- **Modo escuro**: toggle no rodapé da sidebar, claro como padrão. São duas paletas de
+  passos próprios, cada uma validada contra a sua superfície (separação sob daltonismo e
+  contraste), e não uma inversão automática da clara - a validação é o motivo de o modo
+  escuro ter ficado de fora até agora, e ela foi feita antes de ele entrar. Números em
+  [docs/decisoes.md](docs/decisoes.md).
