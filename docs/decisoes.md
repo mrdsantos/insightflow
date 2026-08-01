@@ -149,6 +149,10 @@ Toda cor continua vivendo só em `app/theme.py`; nenhum gráfico declara cor pr�
 mudou é que `theme.py` deixou de ser um módulo de constantes e passou a resolver a paleta
 por sessão - ver a decisão seguinte.
 
+O "claro como padrão" do título vale só para as duas decisões seguintes: a de "quem decide
+o modo é o frontend" o revê, por um bug que ele não tinha como evitar. As duas paletas e a
+validação continuam valendo integralmente.
+
 ## O tema é por sessão, então o template do Plotly deixou de ser global
 
 `app/theme.py` registrava o template como efeito colateral de import e o marcava em
@@ -177,17 +181,51 @@ pronto e correto e trocar de tema é ação de uma vez por visita. A sidebar avi
 comportamento em vez de escondê-lo.
 
 Um detalhe de implementação que decorre disso: `st.query_params` esconde `embed_options`,
-então o Python não consegue ler o parâmetro que o frontend usa. O toggle carrega um
-`tema=claro|escuro` próprio ao lado, e o valor fica espelhado em `st.session_state`
-porque a navegação entre páginas não leva a query string junto.
+então o Python não consegue ler o parâmetro que o frontend usa. Ele descobre o modo por
+outro caminho - ver a decisão seguinte.
 
-## Sem `[theme.light]` no config.toml
+## Quem decide o modo é o frontend; o Python só pergunta qual saiu
 
-O `config.toml` declara `[theme]` (claro, e o padrão) e `[theme.dark]`, mas não um
-`[theme.light]`. Declarar os dois lados faz o Streamlit montar um "Custom Theme Auto", que
-segue o tema do sistema operacional - e o requisito é abrir claro independente do sistema.
-Sem `[theme.light]`, o carregamento sem parâmetro cai no `[theme]` por construção. Por
-isso o link de volta para o claro não passa `embed_options` nenhum.
+Esta decisão corrige um bug e reverte a parte de "claro é o padrão, o tema do sistema
+nunca é consultado" da decisão acima. O sintoma: num Chrome com
+`prefers-color-scheme: dark`, o dashboard abria com o chrome do Streamlit escuro e os
+gráficos claros, e o texto dos KPIs (`#0b0b0b`) ficava ilegível sobre `#1a1a19`. Persistia
+mesmo com `?tema=claro` explícito na URL.
+
+A causa está no bundle do `streamlit==1.60.0`, em duas funções:
+
+- `createCustomThemes` monta **três** temas - Custom Theme Light, Custom Theme Dark e
+  Custom Theme Auto - sempre que **qualquer uma** das subseções de tema tem conteúdo
+  (`if (temLight || temDark)`). Basta o `[theme.dark]`. A seção antiga deste arquivo
+  afirmava que era preciso declarar os dois lados, e essa premissa é que estava errada.
+- `processThemeInput` resolve a preferência da URL (`embed_options`), depois a do
+  `localStorage`; **se nenhuma das duas existe e há mais de um tema, ele escolhe o Auto**,
+  que é `matchMedia('(prefers-color-scheme: dark)')`.
+
+Então o frontend seguia o sistema operacional, e o `tema=claro|escuro` do projeto não
+mudava nada: é parâmetro inventado aqui, e o frontend não o lê. Havia duas autoridades
+decidindo o modo sem se falarem, e a divergência era estrutural, não um caso de borda.
+
+Não existe configuração que force o claro mantendo o escuro disponível: tirar o
+`[theme.dark]` derruba o Auto mas torna o escuro inalcançável, porque com tema custom o
+Streamlit descarta os temas predefinidos. E `embed_options` não sobrevive à troca de
+página - só é preservado sob `embed=true` -, então corrigir apenas o link do toggle
+deixaria o bug voltar num F5 em página interna.
+
+Ficou uma autoridade só. `theme.paleta()` não decide mais nada: devolve `ESCURO` quando
+`st.context.theme.type` é `"dark"` e `CLARO` no resto, incluindo o `None` de quando não há
+navegador do outro lado. O toggle passou a declarar `embed_options` nos dois sentidos, e o
+parâmetro próprio saiu da URL junto com o espelho em `st.session_state`, que perdeu a
+função. Chrome e gráfico não têm mais como divergir em nenhuma URL alcançável.
+
+O preço é que o padrão deixou de ser claro e passou a ser o modo do sistema, o que
+contraria o desenho original. Vale mais do que custa: quem escolhe pelo toggle continua
+mandando, quem não escolhe recebe o modo que já pediu ao sistema operacional, e o estado
+inconsistente deixou de existir. `st.context.theme` ser somente leitura é exatamente o que
+se usa aqui - lê-se o modo, não se manda nele.
+
+Uma limitação conhecida fica de pé: o valor chega junto do rerun do navegador, então uma
+troca de tema do sistema no meio da sessão só alcança os gráficos na interação seguinte.
 
 ## O dashboard não calcula nada em pandas
 
