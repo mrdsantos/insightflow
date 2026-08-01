@@ -20,7 +20,14 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 
 ## Sprint 2 - EDA e SQL
 
-Pendente - inicia no bloco 2.
+| Requisito | Entrega | Status |
+|---|---|---|
+| 1. Extrair estatisticas descritivas do conjunto de dados | `sql/consultas/q_descritivas.sql` (min/quartis/mediana/media/desvio por metrica) lida e discutida em `notebooks/02_eda.ipynb` | ok |
+| 2. Consultas SQL complexas com Joins, Window Functions e Group By | Joins do star schema em `dw.vw_vendas`; window functions: LAG (`vw_kpis_mensais`, `vw_crescimento_categoria`, `q_yoy.sql`), NTILE (`vw_rfm`, `vw_receita_top_clientes`), MIN OVER (`vw_coorte_retencao`), SUM OVER + ROW_NUMBER (`vw_pareto_produtos`), FILTER (`vw_produtos_metricas`); GROUP BY multi-grao em `vw_faturamento_mensal`. Todas em `sql/views/`, aplicadas por `scripts/migrate.py` | ok |
+| 3. Analise de correlacao e identificacao de outliers | Correlacao Pearson x Spearman em dois graos (item e cliente) e comparacao IQR vs z-score em `notebooks/02_eda.ipynb` + `sql/consultas/q_outliers.sql`; criterio escolhido registrado em `docs/decisoes.md` | ok |
+| Pergunta de negocio: perfil de consumo e segmentacao (ex: RFM) | `dw.vw_rfm` (NTILE(5), 10 segmentos nomeados) + `dw.vw_coorte_retencao`/`dw.vw_curva_retencao`; consumo na pagina Clientes no bloco 3 | ok |
+| Base do dashboard da Sprint 3 (KPIs nomeados no enunciado) | `dw.vw_kpis_mensais`: Faturamento Total, Ticket Medio, Taxa de Retencao e Churn Rate mes a mes; definicao de churn em `docs/decisoes.md` | ok |
+| Contrato de dados tela -> view | `docs/contrato-dados.md`: 12 views, nenhuma orfa, nenhum elemento sem fonte | ok |
 
 ## Sprint 3 - Visualizacao e Dashboard
 

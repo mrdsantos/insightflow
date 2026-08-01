@@ -15,6 +15,7 @@ from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
 RAIZ = Path(__file__).resolve().parent.parent
 PASTA_DDL = RAIZ / "sql" / "ddl"
+PASTA_VIEWS = RAIZ / "sql" / "views"
 
 
 def main():
@@ -38,6 +39,10 @@ def main():
         for arquivo in sorted(PASTA_DDL.glob("*.sql")):
             conn.execute(arquivo.read_text(encoding="utf-8"))
             print(f"aplicado {arquivo.name}")
+        # views por ultimo: CREATE OR REPLACE depende das tabelas ja existirem
+        for arquivo in sorted(PASTA_VIEWS.glob("*.sql")):
+            conn.execute(arquivo.read_text(encoding="utf-8"))
+            print(f"aplicado views/{arquivo.name}")
         conn.commit()
 
 
