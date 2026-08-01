@@ -16,6 +16,7 @@ import pandas as pd
 import streamlit as st
 
 import dados
+import theme
 
 STATUS_CONCRETIZADA = ["Entregue", "Enviado"]
 
@@ -74,6 +75,38 @@ def _periodo(op: dict) -> tuple[dt.date, dt.date]:
     return st.session_state["flt_ini"], st.session_state["flt_fim"]
 
 
+def _toggle_tema() -> None:
+    """Link de troca de tema, no rodape da sidebar.
+
+    E ancora crua, e nao st.button ou st.link_button, de proposito. O Streamlit
+    resolve o tema uma vez no boot da pagina e nao expoe API para troca-lo em
+    runtime, entao a troca precisa ser uma navegacao de verdade: widget so dispara
+    rerun, e rerun nao recarrega. `embed_options=dark_theme` e o unico gancho
+    suportado que vence localStorage e a preferencia do sistema - e, ao contrario
+    de show_toolbar e companhia, ele nao depende de `embed=true`, entao nada do
+    chrome da pagina e removido junto.
+
+    O `tema` proprio anda ao lado porque `st.query_params` esconde `embed_options`:
+    o Python nao consegue ler o parametro que o frontend usa.
+
+    Volta para o claro sem parametro nenhum de embed - assim o Streamlit cai no
+    bloco [theme] do config.toml, que e a paleta clara e o default do projeto.
+    """
+    cores = theme.paleta()
+    escuro = cores.MODO == "escuro"
+    destino = "?tema=claro" if escuro else "?tema=escuro&embed_options=dark_theme"
+    rotulo = "Tema claro" if escuro else "Tema escuro"
+    st.divider()
+    st.markdown(
+        f"<a href='{destino}' target='_self' style='display:inline-block;"
+        f"padding:0.25rem 0.75rem;border:1px solid {cores.EIXO};border-radius:0.5rem;"
+        f"color:{cores.TINTA_SECUNDARIA};font-size:0.875rem;text-decoration:none'>"
+        f"{rotulo}</a>",
+        unsafe_allow_html=True,
+    )
+    st.caption("Trocar o tema recarrega a página e volta os filtros ao padrão.")
+
+
 def sidebar(op: dict) -> dict:
     """Renderiza a sidebar e devolve a selecao corrente.
 
@@ -108,6 +141,7 @@ def sidebar(op: dict) -> dict:
             help="Padrão: apenas venda concretizada (Entregue e Enviado).",
         )
         st.button("Limpar filtros", on_click=_limpar, args=(op,))
+        _toggle_tema()
 
     ini, fim = _periodo(op)
     return {
