@@ -39,11 +39,16 @@ def main():
         for arquivo in sorted(PASTA_DDL.glob("*.sql")):
             conn.execute(arquivo.read_text(encoding="utf-8"))
             print(f"aplicado {arquivo.name}")
-        # views por ultimo: CREATE OR REPLACE depende das tabelas ja existirem
+        # views por ultimo: CREATE OR REPLACE depende das tabelas ja existirem.
+        # O prefixo numerico do arquivo e a ordem de dependencia entre as proprias
+        # views (vw_vendas antes de quem le dela) - tests/test_ordem_views.py guarda isso.
         for arquivo in sorted(PASTA_VIEWS.glob("*.sql")):
             conn.execute(arquivo.read_text(encoding="utf-8"))
             print(f"aplicado views/{arquivo.name}")
         conn.commit()
+        # tudo acima roda numa transacao so: sem esta linha, um erro no meio faz
+        # rollback e os "aplicado ..." acima viram mentira
+        print("commit ok")
 
 
 if __name__ == "__main__":
