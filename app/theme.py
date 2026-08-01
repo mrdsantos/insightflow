@@ -8,9 +8,8 @@ baixo: os passos escuros foram escolhidos para a superficie escura e validados
 contra ela (separacao sob daltonismo e contraste), do mesmo jeito que os claros
 foram validados contra a clara. Numeros em docs/decisoes.md.
 
-O modo vem do parametro `tema` da URL e fica espelhado em `st.session_state`,
-porque a troca de pagina nao carrega a query string junto. Claro e o default: o
-tema do sistema operacional nunca e consultado.
+Quem escolhe o modo e o frontend, nao o Python - ver `paleta()`. Aqui so existem
+os dois conjuntos de tokens e a pergunta de qual deles vale agora.
 """
 
 from dataclasses import dataclass
@@ -182,13 +181,15 @@ for _p in MODOS.values():
 
 
 def paleta() -> Paleta:
-    """Paleta da sessao corrente.
+    """Paleta do modo que o frontend esta de fato pintando.
 
-    Le o modo da URL quando ele vem de la (recarga vinda do toggle) e o guarda na
-    sessao, que e o que sobrevive a navegacao entre paginas. Sem nenhum dos dois,
-    claro - e nao o tema do sistema.
+    O Streamlit resolve o tema sozinho no boot e nao aceita ordem do Python: o
+    unico gancho e `embed_options` na URL, que o `st.query_params` nem enxerga.
+    Entao o Python nao decide o modo - ele pergunta qual saiu e devolve a paleta
+    correspondente. Uma autoridade so e o que impede o chrome e o grafico de
+    divergirem, que era o bug de quando este modulo decidia por conta propria.
+
+    `type` vem None quando nao ha navegador do outro lado (AppTest, boot sem
+    sessao); cai no claro, o mesmo fallback que o frontend usa sem `matchMedia`.
     """
-    modo = st.query_params.get("tema")
-    if modo in MODOS:
-        st.session_state["tema"] = modo
-    return MODOS.get(st.session_state.get("tema"), CLARO)
+    return ESCURO if st.context.theme.type == "dark" else CLARO

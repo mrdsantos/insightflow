@@ -20,6 +20,14 @@ import theme
 
 STATUS_CONCRETIZADA = ["Entregue", "Enviado"]
 
+# Para onde o toggle navega, a partir do modo corrente. Os dois sentidos declaram
+# `embed_options`: sem ele o Streamlit monta um "Custom Theme Auto" e segue o tema
+# do sistema operacional, e ai o claro nao volta em quem esta no escuro.
+DESTINO_TEMA = {
+    "claro": "?embed_options=dark_theme",
+    "escuro": "?embed_options=light_theme",
+}
+
 PRESETS = [
     "Tudo",
     "Últimos 30 dias",
@@ -81,20 +89,18 @@ def _toggle_tema() -> None:
     E ancora crua, e nao st.button ou st.link_button, de proposito. O Streamlit
     resolve o tema uma vez no boot da pagina e nao expoe API para troca-lo em
     runtime, entao a troca precisa ser uma navegacao de verdade: widget so dispara
-    rerun, e rerun nao recarrega. `embed_options=dark_theme` e o unico gancho
-    suportado que vence localStorage e a preferencia do sistema - e, ao contrario
-    de show_toolbar e companhia, ele nao depende de `embed=true`, entao nada do
-    chrome da pagina e removido junto.
+    rerun, e rerun nao recarrega. `embed_options` e o unico gancho suportado que
+    vence localStorage e a preferencia do sistema - e, ao contrario de show_toolbar
+    e companhia, ele nao depende de `embed=true`, entao nada do chrome da pagina e
+    removido junto.
 
-    O `tema` proprio anda ao lado porque `st.query_params` esconde `embed_options`:
-    o Python nao consegue ler o parametro que o frontend usa.
-
-    Volta para o claro sem parametro nenhum de embed - assim o Streamlit cai no
-    bloco [theme] do config.toml, que e a paleta clara e o default do projeto.
+    O link nao carrega parametro proprio do projeto: quem le a URL e o frontend, e
+    ele so entende `embed_options`. Quem conta ao Python qual modo saiu dai e o
+    `theme.paleta()`, pelo `st.context`.
     """
     cores = theme.paleta()
     escuro = cores.MODO == "escuro"
-    destino = "?tema=claro" if escuro else "?tema=escuro&embed_options=dark_theme"
+    destino = DESTINO_TEMA[cores.MODO]
     rotulo = "Tema claro" if escuro else "Tema escuro"
     st.divider()
     st.markdown(
