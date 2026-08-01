@@ -88,10 +88,12 @@ def sidebar(op: dict) -> dict:
         st.selectbox("Periodo", PRESETS, key="flt_preset")
         if st.session_state["flt_preset"] == "Personalizado":
             st.date_input(
-                "De", key="flt_ini", min_value=op["data_min"], max_value=op["data_max"]
+                "De", key="flt_ini", min_value=op["data_min"], max_value=op["data_max"],
+                format="DD/MM/YYYY",
             )
             st.date_input(
-                "Ate", key="flt_fim", min_value=op["data_min"], max_value=op["data_max"]
+                "Ate", key="flt_fim", min_value=op["data_min"], max_value=op["data_max"],
+                format="DD/MM/YYYY",
             )
         st.caption(f"Presets contam a partir da ultima venda da base: {op['data_max']:%d/%m/%Y}")
         st.multiselect(
@@ -102,6 +104,7 @@ def sidebar(op: dict) -> dict:
             "Status do pedido",
             op["status"],
             key="flt_status",
+            placeholder="Todas",
             help="Padrao: apenas venda concretizada (Entregue e Enviado).",
         )
         st.button("Limpar filtros", on_click=_limpar, args=(op,))

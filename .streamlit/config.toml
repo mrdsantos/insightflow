@@ -8,3 +8,8 @@ font = "sans serif"
 
 [browser]
 gatherUsageStats = false
+
+# Sem o menu de desenvolvedor: os itens dele sao fixos em ingles no bundle do
+# Streamlit e nao servem para quem so vai ler o dashboard.
+[client]
+toolbarMode = "minimal"
