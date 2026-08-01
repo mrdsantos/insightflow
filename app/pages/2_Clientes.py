@@ -129,7 +129,7 @@ with aba_seg:
     # Dispersao e forma par-a-par: teto de 3 series coloridas; colorir os 10
     # segmentos enterraria justamente os que importam.
     DESTAQUES = {
-        "Campeoes": theme.AZUL,
+        "Campeões": theme.AZUL,
         "Em Risco": theme.LARANJA,
         "Perdidos": theme.AQUA,
     }

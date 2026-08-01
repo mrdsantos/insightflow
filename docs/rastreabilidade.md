@@ -39,7 +39,7 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 | Ferramenta de BI: bibliotecas Python (Streamlit/Dash) aceitas pelo enunciado | Streamlit + Plotly; corte do Power BI justificado em `docs/decisoes.md`. Tema e paleta centralizados em `app/theme.py` e `.streamlit/config.toml` | ok |
 | Entrega 4: link público do dashboard | Publicado em https://insightflow.maiconsantos.com.br/ via Dokploy (Docker Swarm), imagem construída pelo `Dockerfile`; link no topo do README | ok |
 | `st.cache_data` nas queries (requisito do plano) | `app/dados.py`: `ler_view` com `st.cache_data(ttl=600)` e engine única via `st.cache_resource` | ok |
-| Página Previsão | `app/pages/4_Previsao.py` completa na Sprint 4: KPIs, histórico + ajuste + projeção tracejada com banda, tabela modelo vs baseline, leitura do resultado | ok |
+| Página Previsão | `app/pages/4_Previsão.py` completa na Sprint 4: KPIs, histórico + ajuste + projeção tracejada com banda, tabela modelo vs baseline, leitura do resultado | ok |
 
 ## Sprint 4 - Storytelling e Modelo Preditivo
 
