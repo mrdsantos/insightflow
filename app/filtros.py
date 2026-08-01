@@ -21,9 +21,9 @@ STATUS_CONCRETIZADA = ["Entregue", "Enviado"]
 
 PRESETS = [
     "Tudo",
-    "Ultimos 30 dias",
-    "Ultimos 90 dias",
-    "Ultimos 180 dias",
+    "Últimos 30 dias",
+    "Últimos 90 dias",
+    "Últimos 180 dias",
     "Ano corrente",
     "Personalizado",
 ]
@@ -63,11 +63,11 @@ def _periodo(op: dict) -> tuple[dt.date, dt.date]:
     fim = op["data_max"]
     if preset == "Tudo":
         return op["data_min"], fim
-    if preset == "Ultimos 30 dias":
+    if preset == "Últimos 30 dias":
         return fim - dt.timedelta(days=30), fim
-    if preset == "Ultimos 90 dias":
+    if preset == "Últimos 90 dias":
         return fim - dt.timedelta(days=90), fim
-    if preset == "Ultimos 180 dias":
+    if preset == "Últimos 180 dias":
         return fim - dt.timedelta(days=180), fim
     if preset == "Ano corrente":
         return dt.date(fim.year, 1, 1), fim
@@ -85,17 +85,17 @@ def sidebar(op: dict) -> dict:
 
     with st.sidebar:
         st.subheader("Filtros")
-        st.selectbox("Periodo", PRESETS, key="flt_preset")
+        st.selectbox("Período", PRESETS, key="flt_preset")
         if st.session_state["flt_preset"] == "Personalizado":
             st.date_input(
                 "De", key="flt_ini", min_value=op["data_min"], max_value=op["data_max"],
                 format="DD/MM/YYYY",
             )
             st.date_input(
-                "Ate", key="flt_fim", min_value=op["data_min"], max_value=op["data_max"],
+                "Até", key="flt_fim", min_value=op["data_min"], max_value=op["data_max"],
                 format="DD/MM/YYYY",
             )
-        st.caption(f"Presets contam a partir da ultima venda da base: {op['data_max']:%d/%m/%Y}")
+        st.caption(f"Presets contam a partir da última venda da base: {op['data_max']:%d/%m/%Y}")
         st.multiselect(
             "Categoria", op["categorias"], key="flt_categorias", placeholder="Todas"
         )
@@ -105,7 +105,7 @@ def sidebar(op: dict) -> dict:
             op["status"],
             key="flt_status",
             placeholder="Todas",
-            help="Padrao: apenas venda concretizada (Entregue e Enviado).",
+            help="Padrão: apenas venda concretizada (Entregue e Enviado).",
         )
         st.button("Limpar filtros", on_click=_limpar, args=(op,))
 

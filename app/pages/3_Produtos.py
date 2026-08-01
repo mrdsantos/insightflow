@@ -37,11 +37,11 @@ concentracao = pareto.loc[pareto["posicao"] == n_top20, "pct_acumulado"].iloc[0]
 
 c1, c2, c3, c4 = st.columns(4)
 ui.stat_tile(c1, "SKUs ativos no recorte", ui.fmt_num(vendas["nome_produto"].nunique()))
-ui.stat_tile(c2, "Categoria lider no recorte", por_categoria.idxmax())
-ui.stat_tile(c3, "Produto lider (base completa)", pareto.iloc[0]["produto"])
+ui.stat_tile(c2, "Categoria líder no recorte", por_categoria.idxmax())
+ui.stat_tile(c3, "Produto líder (base completa)", pareto.iloc[0]["produto"])
 ui.stat_tile(
     c4,
-    f"Concentracao: top 20% dos produtos ({n_top20} SKUs)",
+    f"Concentração: top 20% dos produtos ({n_top20} SKUs)",
     ui.fmt_pct(concentracao),
 )
 
@@ -56,7 +56,7 @@ ui.nota_estrutural()
 fig = go.Figure()
 fig.add_bar(
     x=pareto["produto"], y=pareto["pct_faturamento"],
-    name="Participacao no faturamento (%)", marker_color=theme.AZUL,
+    name="Participação no faturamento (%)", marker_color=theme.AZUL,
 )
 fig.add_scatter(
     x=pareto["produto"], y=pareto["pct_acumulado"], mode="lines",
@@ -68,7 +68,7 @@ fig.add_annotation(
     text="80%", showarrow=False, font=dict(color=theme.TINTA_SECUNDARIA, size=12),
 )
 fig.update_layout(
-    title="Pareto de produtos: participacao e acumulado na mesma escala",
+    title="Pareto de produtos: participação e acumulado na mesma escala",
     yaxis=dict(title="% do faturamento total", range=[0, 105]),
     height=480,
 )
@@ -144,7 +144,7 @@ for produto, (rotulo, cor) in destaques.items():
     )
 fig.add_hline(y=0, line_color=theme.EIXO, line_width=1)
 fig.update_layout(
-    title="Crescimento (ultimos 3 meses vs 3 anteriores) x faturamento total",
+    title="Crescimento (últimos 3 meses vs 3 anteriores) x faturamento total",
     xaxis_title="Faturamento total (R$)",
     yaxis_title="Crescimento (%)",
     height=480,

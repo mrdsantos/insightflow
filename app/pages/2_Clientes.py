@@ -11,7 +11,7 @@ import filtros
 import theme
 import ui
 
-st.title("Quem sao meus clientes e quais estao em risco?")
+st.title("Quem são meus clientes e quais estão em risco?")
 
 op = filtros.opcoes()
 sel = filtros.sidebar(op)
@@ -34,16 +34,16 @@ RAMPA = [[i / (len(theme.RAMPA_AZUL) - 1), cor] for i, cor in enumerate(theme.RA
 mensal = kpis_per.sort_values("ano_mes")
 c1, c2, c3, c4 = st.columns(4)
 ui.stat_tile(
-    c1, "Clientes Ativos (media mensal)",
+    c1, "Clientes Ativos (média mensal)",
     ui.fmt_num(mensal["clientes_ativos"].mean()),
     serie=mensal["clientes_ativos"], key="spark_ativos",
 )
 ui.stat_tile(
-    c2, "Novos no Periodo", ui.fmt_num(mensal["clientes_novos"].sum()),
+    c2, "Novos no Período", ui.fmt_num(mensal["clientes_novos"].sum()),
     serie=mensal["clientes_novos"], key="spark_novos",
 )
 ui.stat_tile(
-    c3, "Ticket Medio por Cliente",
+    c3, "Ticket Médio por Cliente",
     ui.fmt_moeda(mensal["faturamento"].sum() / mensal["clientes_ativos"].sum(), 2),
     serie=mensal["ticket_medio_cliente"], key="spark_ticket_cli",
 )
@@ -52,9 +52,9 @@ ui.stat_tile(
     ui.fmt_pct(top10["pct_receita_top10"].iloc[0]),
 )
 with c4:
-    st.caption("Base completa de vendas concretizadas; nao reage aos filtros.")
+    st.caption("Base completa de vendas concretizadas; não reage aos filtros.")
 
-aba_seg, aba_ret = st.tabs(["Segmentacao", "Retencao"])
+aba_seg, aba_ret = st.tabs(["Segmentação", "Retenção"])
 
 
 # ---- Aba Segmentacao --------------------------------------------------------
@@ -80,9 +80,9 @@ with aba_seg:
         )
     )
     fig.update_layout(
-        title="Matriz RFM: clientes por Recencia x Frequencia",
-        xaxis_title="Score de recencia (5 = comprou ha pouco)",
-        yaxis_title="Score de frequencia (5 = compra mais)",
+        title="Matriz RFM: clientes por Recência x Frequência",
+        xaxis_title="Score de recência (5 = comprou há pouco)",
+        yaxis_title="Score de frequência (5 = compra mais)",
         height=420,
     )
     with col_esq:
@@ -139,18 +139,18 @@ with aba_seg:
         x=resto["recencia_dias"], y=resto["monetario"], mode="markers",
         name="Demais segmentos",
         marker=dict(color=theme.CINZA, size=7, opacity=0.6),
-        hovertemplate="recencia %{x} dias, R$ %{y:,.0f}<extra>outros</extra>",
+        hovertemplate="recência %{x} dias, R$ %{y:,.0f}<extra>outros</extra>",
     )
     for segmento, cor in DESTAQUES.items():
         d = rfm[rfm["segmento"] == segmento]
         fig.add_scatter(
             x=d["recencia_dias"], y=d["monetario"], mode="markers",
             name=segmento, marker=dict(color=cor, size=9),
-            hovertemplate="recencia %{x} dias, R$ %{y:,.0f}<extra>" + segmento + "</extra>",
+            hovertemplate="recência %{x} dias, R$ %{y:,.0f}<extra>" + segmento + "</extra>",
         )
     fig.update_layout(
-        title="Recencia x Valor monetario por cliente",
-        xaxis_title="Dias desde a ultima compra",
+        title="Recência x Valor monetário por cliente",
+        xaxis_title="Dias desde a última compra",
         yaxis_title="Receita total do cliente (R$)",
         height=460,
         hoverdistance=24,
@@ -177,13 +177,13 @@ with aba_ret:
             colorscale=RAMPA,
             zmin=0, zmax=100,
             colorbar=dict(title="% retido", outlinewidth=0),
-            hovertemplate="coorte %{y}, mes %{x}: %{z}%<extra></extra>",
+            hovertemplate="coorte %{y}, mês %{x}: %{z}%<extra></extra>",
         )
     )
     fig.update_layout(
-        title="Retencao por coorte de primeira compra",
+        title="Retenção por coorte de primeira compra",
         xaxis_title="Meses desde a primeira compra",
-        yaxis_title="Coorte (mes da primeira compra)",
+        yaxis_title="Coorte (mês da primeira compra)",
         yaxis_autorange="reversed",
         height=560,
     )
@@ -197,9 +197,9 @@ with aba_ret:
         )
     )
     fig.update_layout(
-        title="Curva media de retencao",
+        title="Curva média de retenção",
         xaxis_title="Meses desde a primeira compra",
-        yaxis_title="% medio retido",
+        yaxis_title="% médio retido",
         height=380,
     )
     st.plotly_chart(fig, width="stretch", key="curva_retencao", config=ui.CONFIG_GRAFICO)

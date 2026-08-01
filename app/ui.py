@@ -87,7 +87,7 @@ def stat_tile(
             st.markdown(
                 f"<span style='color:{cor};font-size:0.9rem'>{seta} {delta_texto}"
                 f"</span> <span style='color:{theme.ROTULO_EIXO};font-size:0.8rem'>"
-                f"vs periodo anterior</span>",
+                f"vs período anterior</span>",
                 unsafe_allow_html=True,
             )
         if serie is not None and len(serie) > 1:
@@ -115,6 +115,6 @@ def gemeo_tabular(df: pd.DataFrame, rotulo: str = "Ver dados") -> None:
 
 def nota_estrutural() -> None:
     st.caption(
-        "Analise estrutural sobre a base completa de vendas concretizadas; "
-        "nao reage aos filtros da barra lateral."
+        "Análise estrutural sobre a base completa de vendas concretizadas; "
+        "não reage aos filtros da barra lateral."
     )

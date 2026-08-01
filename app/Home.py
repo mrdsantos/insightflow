@@ -3,14 +3,14 @@
 import plotly.graph_objects as go
 import streamlit as st
 
-st.set_page_config(page_title="InsightFlow - Visao Geral", layout="wide")
+st.set_page_config(page_title="InsightFlow - Visão Geral", layout="wide")
 
 import dados
 import filtros
 import theme
 import ui
 
-st.title("Como o negocio esta performando e para onde esta indo?")
+st.title("Como o negócio está performando e para onde está indo?")
 
 op = filtros.opcoes()
 sel = filtros.sidebar(op)
@@ -62,14 +62,14 @@ ui.stat_tile(
 )
 d = deltas["ticket"]
 ui.stat_tile(
-    c2, "Ticket Medio", ui.fmt_moeda(ticket_atual, 2),
+    c2, "Ticket Médio", ui.fmt_moeda(ticket_atual, 2),
     serie=mensal["ticket_medio"], key="spark_ticket",
     delta_texto=None if d is None else ui.fmt_pct(abs(d)),
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
 )
 d = deltas["ret"]
 ui.stat_tile(
-    c3, "Taxa de Retencao", ui.fmt_pct(ret_atual),
+    c3, "Taxa de Retenção", ui.fmt_pct(ret_atual),
     serie=mensal["taxa_retencao"], key="spark_ret",
     delta_texto=None if d is None else f"{ui.fmt_num(abs(d), 1)} p.p.",
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
