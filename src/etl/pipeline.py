@@ -148,7 +148,7 @@ def _gera_relatorio(linhas, limpos, rejeitados, resumo):
         "",
     ]
     CAMINHO_RELATORIO.parent.mkdir(parents=True, exist_ok=True)
-    CAMINHO_RELATORIO.write_text("\n".join(txt), encoding="utf-8")
+    CAMINHO_RELATORIO.write_text("\n".join(txt), encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":
