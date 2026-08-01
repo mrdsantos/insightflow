@@ -5,8 +5,8 @@ import streamlit as st
 
 st.set_page_config(page_title="InsightFlow - Definições", layout="wide")
 
-# Sem theme e sem ui, ao contrario das outras quatro paginas: theme existe para
-# registrar o template do Plotly, e aqui nao ha grafico nenhum.
+# Sem theme e sem ui, ao contrario das outras quatro paginas: aqui nao ha grafico
+# nenhum, e o toggle de tema da sidebar ja resolve a paleta por dentro de filtros.
 import definicoes
 import filtros
 

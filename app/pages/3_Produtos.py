@@ -13,6 +13,8 @@ import filtros
 import theme
 import ui
 
+cores = theme.paleta()
+
 st.title("O que vender mais e o que descontinuar?")
 
 op = filtros.opcoes()
@@ -67,16 +69,16 @@ ui.nota_estrutural()
 fig = go.Figure()
 fig.add_bar(
     x=pareto["produto"], y=pareto["pct_faturamento"],
-    name="Participação no faturamento (%)", marker_color=theme.AZUL,
+    name="Participação no faturamento (%)", marker_color=cores.AZUL,
 )
 fig.add_scatter(
     x=pareto["produto"], y=pareto["pct_acumulado"], mode="lines",
-    name="Acumulado (%)", line=dict(color=theme.LARANJA, width=2),
+    name="Acumulado (%)", line=dict(color=cores.LARANJA, width=2),
 )
-fig.add_hline(y=80, line_color=theme.CINZA, line_width=1)
+fig.add_hline(y=80, line_color=cores.CINZA, line_width=1)
 fig.add_annotation(
     x=1.0, xref="paper", y=80, yanchor="bottom", xanchor="right",
-    text="80%", showarrow=False, font=dict(color=theme.TINTA_SECUNDARIA, size=12),
+    text="80%", showarrow=False, font=dict(color=cores.TINTA_SECUNDARIA, size=12),
 )
 fig.update_layout(
     title="Pareto de produtos: participação e acumulado na mesma escala",
@@ -84,7 +86,7 @@ fig.update_layout(
     height=480,
 )
 fig.update_xaxes(tickangle=-45)
-st.plotly_chart(fig, width="stretch", key="pareto", config=ui.CONFIG_GRAFICO)
+ui.grafico(fig, key="pareto")
 ui.leitura(
     "8 dos 30 SKUs pagam 80% do faturamento, e o Notebook Gamer sozinho responde por "
     "22,6%. Concentração assim é risco operacional, não só foco comercial."
@@ -108,19 +110,19 @@ if categorias:
         d = cresc[cresc["categoria"] == categoria].sort_values("ano_mes")
         fig.add_scatter(
             x=pd.to_datetime(d["ano_mes"] + "-01"), y=d["mom_pct"],
-            mode="lines", line=dict(color=theme.AZUL, width=2),
+            mode="lines", line=dict(color=cores.AZUL, width=2),
             showlegend=False, name=categoria,
             row=i // n_col + 1, col=i % n_col + 1,
             customdata=d["ano_mes"].map(ui.rotulo_mes),
             hovertemplate="%{customdata}: %{y:.1f}%<extra>" + categoria + "</extra>",
         )
-    fig.add_hline(y=0, line_color=theme.EIXO, line_width=1)
+    fig.add_hline(y=0, line_color=cores.EIXO, line_width=1)
     fig.update_layout(
         title="Crescimento MoM por categoria (%)", height=220 * n_lin + 80
     )
     fig.update_xaxes(**ui.eixo_mes(cresc["ano_mes"], passo=6, como_data=True))
-    fig.update_annotations(font=dict(size=12, color=theme.TINTA_SECUNDARIA))
-    st.plotly_chart(fig, width="stretch", key="mom_categorias", config=ui.CONFIG_GRAFICO)
+    fig.update_annotations(font=dict(size=12, color=cores.TINTA_SECUNDARIA))
+    ui.grafico(fig, key="mom_categorias")
     ui.leitura(
         "Um painel por categoria na mesma escala Y, em vez de linhas sobrepostas: "
         "acima de três séries a cor deixa de distinguir. MoM sobre base pequena "
@@ -138,9 +140,9 @@ ui.nota_estrutural()
 validos = prod_met.dropna(subset=["crescimento_pct"]).reset_index(drop=True)
 destaques = {}
 for rotulo, idx, cor in [
-    ("maior volume", validos["faturamento"].idxmax(), theme.AZUL),
-    ("maior crescimento", validos["crescimento_pct"].idxmax(), theme.LARANJA),
-    ("maior queda", validos["crescimento_pct"].idxmin(), theme.AQUA),
+    ("maior volume", validos["faturamento"].idxmax(), cores.AZUL),
+    ("maior crescimento", validos["crescimento_pct"].idxmax(), cores.LARANJA),
+    ("maior queda", validos["crescimento_pct"].idxmin(), cores.AQUA),
 ]:
     produto = validos.loc[idx, "produto"]
     if produto not in destaques:
@@ -150,7 +152,7 @@ resto = validos[~validos["produto"].isin(destaques)]
 fig = go.Figure()
 fig.add_scatter(
     x=resto["faturamento"], y=resto["crescimento_pct"], mode="markers",
-    name="Demais produtos", marker=dict(color=theme.CINZA, size=8, opacity=0.7),
+    name="Demais produtos", marker=dict(color=cores.CINZA, size=8, opacity=0.7),
     hovertemplate="%{customdata}: R$ %{x:,.0f}, %{y}%<extra></extra>",
     customdata=resto["produto"],
 )
@@ -160,11 +162,11 @@ for produto, (rotulo, cor) in destaques.items():
         x=d["faturamento"], y=d["crescimento_pct"], mode="markers+text",
         name=f"{produto} ({rotulo})", marker=dict(color=cor, size=11),
         text=[produto], textposition="top center",
-        textfont=dict(color=theme.TINTA_SECUNDARIA, size=12),
+        textfont=dict(color=cores.TINTA_SECUNDARIA, size=12),
         hovertemplate="%{text}: R$ %{x:,.0f}, %{y}%<extra></extra>",
         cliponaxis=False,
     )
-fig.add_hline(y=0, line_color=theme.EIXO, line_width=1)
+fig.add_hline(y=0, line_color=cores.EIXO, line_width=1)
 fig.update_layout(
     title="Crescimento (últimos 3 meses vs 3 anteriores) x faturamento total",
     xaxis_title="Faturamento total (R$)",
@@ -172,7 +174,7 @@ fig.update_layout(
     height=480,
     hoverdistance=24,
 )
-st.plotly_chart(fig, width="stretch", key="matriz_produtos", config=ui.CONFIG_GRAFICO)
+ui.grafico(fig, key="matriz_produtos")
 ui.leitura(
     "Leia por quadrante: faturamento alto com crescimento negativo, à direita e "
     "abaixo do zero, é o caso que exige ação. Alto e crescendo é o que precisa de "

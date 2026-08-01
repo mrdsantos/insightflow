@@ -11,6 +11,8 @@ import filtros
 import theme
 import ui
 
+cores = theme.paleta()
+
 st.title("Como o negócio está performando e para onde está indo?")
 st.caption(
     "Painel de vendas de um e-commerce simulado, do faturamento ao modelo de previsão. "
@@ -99,19 +101,19 @@ serie = fat.groupby("ano_mes", as_index=False)["faturamento"].sum().sort_values(
 fig = go.Figure()
 fig.add_scatter(
     x=serie["ano_mes"], y=serie["faturamento"], mode="lines",
-    line=dict(color=theme.AZUL, width=2), name="Faturamento", showlegend=False,
+    line=dict(color=cores.AZUL, width=2), name="Faturamento", showlegend=False,
 )
 ultimo = serie.iloc[-1]
 fig.add_scatter(
     x=[ultimo["ano_mes"]], y=[ultimo["faturamento"]],
     mode="markers+text", text=[ui.fmt_compacto(ultimo["faturamento"])],
-    textposition="top center", textfont=dict(color=theme.TINTA_SECUNDARIA),
-    marker=dict(color=theme.AZUL, size=8),
+    textposition="top center", textfont=dict(color=cores.TINTA_SECUNDARIA),
+    marker=dict(color=cores.AZUL, size=8),
     showlegend=False, hoverinfo="skip", cliponaxis=False,
 )
 fig.update_layout(title="Faturamento mensal", height=380)
 fig.update_xaxes(type="category", **ui.eixo_mes(serie["ano_mes"], passo=2))
-st.plotly_chart(fig, width="stretch", key="serie_mensal", config=ui.CONFIG_GRAFICO)
+ui.grafico(fig, key="serie_mensal")
 if len(serie) < 2:
     texto = "Recorte de um único mês; não há série para comparar pico e média."
 else:
@@ -139,12 +141,12 @@ for i, ano in enumerate(anos):
     fig.add_scatter(
         x=[ui.MESES[m - 1] for m in d["mes"]], y=d["faturamento"],
         mode="lines", name=str(ano),
-        line=dict(color=theme.SLOTS[i], width=2),
+        line=dict(color=cores.SLOTS[i], width=2),
     )
 fig.update_layout(title="Sazonalidade ano a ano", height=380)
 fig.update_xaxes(categoryorder="array", categoryarray=ui.MESES)
 with col_esq:
-    st.plotly_chart(fig, width="stretch", key="sazonalidade", config=ui.CONFIG_GRAFICO)
+    ui.grafico(fig, key="sazonalidade")
     if len(anos) < 2 or fat["ano_mes"].nunique() < 12:
         texto = (
             "Recorte curto para sazonalidade: a forma que se repete só aparece com "
@@ -175,12 +177,12 @@ cat = (
 fig = go.Figure(
     go.Bar(
         x=cat["faturamento"], y=cat["categoria"], orientation="h",
-        marker_color=theme.AZUL, name="Faturamento", showlegend=False,
+        marker_color=cores.AZUL, name="Faturamento", showlegend=False,
     )
 )
 fig.update_layout(title="Faturamento por categoria", height=380)
 with col_dir:
-    st.plotly_chart(fig, width="stretch", key="categorias", config=ui.CONFIG_GRAFICO)
+    ui.grafico(fig, key="categorias")
     if len(cat) < 2:
         texto = "Uma única categoria no recorte; não há concentração a comparar."
     else:
