@@ -6,7 +6,6 @@ Full refresh idempotente: rodar duas vezes deixa as contagens identicas.
 import logging
 import os
 from collections import Counter
-from datetime import datetime
 from pathlib import Path
 
 import psycopg
@@ -94,8 +93,8 @@ def _gera_relatorio(linhas, limpos, rejeitados, resumo):
     txt = [
         "# Relatorio de qualidade dos dados",
         "",
-        f"Gerado pelo pipeline em {datetime.now():%Y-%m-%d %H:%M}. "
-        "Regenerado a cada execucao - nao editar na mao.",
+        "Gerado pelo pipeline a cada execucao - nao editar na mao. "
+        "Sem timestamp de proposito: execucao identica gera arquivo identico.",
         "",
         "## Visao geral",
         "",

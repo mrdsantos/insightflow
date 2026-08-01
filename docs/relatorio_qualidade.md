@@ -1,6 +1,6 @@
 # Relatorio de qualidade dos dados
 
-Gerado pelo pipeline em 2026-07-31 21:32. Regenerado a cada execucao - nao editar na mao.
+Gerado pelo pipeline a cada execucao - nao editar na mao. Sem timestamp de proposito: execucao identica gera arquivo identico.
 
 ## Visao geral
 
