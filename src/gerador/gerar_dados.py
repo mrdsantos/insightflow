@@ -263,7 +263,9 @@ def gerar(caminho=CAMINHO_SAIDA):
 
     caminho.parent.mkdir(parents=True, exist_ok=True)
     with open(caminho, "w", newline="", encoding="utf-8") as f:
-        escritor = csv.DictWriter(f, fieldnames=list(linhas[0].keys()))
+        # lineterminator LF: o repo normaliza para LF, e assim o arquivo regenerado
+        # bate byte a byte com o commitado em qualquer plataforma
+        escritor = csv.DictWriter(f, fieldnames=list(linhas[0].keys()), lineterminator="\n")
         escritor.writeheader()
         escritor.writerows(linhas)
     return len(linhas)
