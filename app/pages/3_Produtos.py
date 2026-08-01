@@ -8,6 +8,7 @@ from plotly.subplots import make_subplots
 st.set_page_config(page_title="InsightFlow - Produtos", layout="wide")
 
 import dados
+import definicoes
 import filtros
 import theme
 import ui
@@ -36,13 +37,23 @@ n_top20 = max(1, round(0.2 * len(pareto)))
 concentracao = pareto.loc[pareto["posicao"] == n_top20, "pct_acumulado"].iloc[0]
 
 c1, c2, c3, c4 = st.columns(4)
-ui.stat_tile(c1, "SKUs ativos no recorte", ui.fmt_num(vendas["nome_produto"].nunique()))
-ui.stat_tile(c2, "Categoria líder no recorte", por_categoria.idxmax())
-ui.stat_tile(c3, "Produto líder (base completa)", pareto.iloc[0]["produto"])
+ui.stat_tile(
+    c1, "SKUs ativos no recorte", ui.fmt_num(vendas["nome_produto"].nunique()),
+    ajuda=definicoes.ajuda("skus_ativos"),
+)
+ui.stat_tile(
+    c2, "Categoria líder no recorte", por_categoria.idxmax(),
+    ajuda=definicoes.ajuda("categoria_lider"),
+)
+ui.stat_tile(
+    c3, "Produto líder (base completa)", pareto.iloc[0]["produto"],
+    ajuda=definicoes.ajuda("produto_lider"),
+)
 ui.stat_tile(
     c4,
     f"Concentração: top 20% dos produtos ({n_top20} SKUs)",
     ui.fmt_pct(concentracao),
+    ajuda=definicoes.ajuda("concentracao_top20"),
 )
 
 

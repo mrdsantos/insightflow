@@ -6,11 +6,16 @@ import streamlit as st
 st.set_page_config(page_title="InsightFlow - Visão Geral", layout="wide")
 
 import dados
+import definicoes
 import filtros
 import theme
 import ui
 
 st.title("Como o negócio está performando e para onde está indo?")
+st.caption(
+    "Painel de vendas de um e-commerce simulado, do faturamento ao modelo de previsão. "
+    "A definição de cada número está na página Definições, na barra lateral."
+)
 
 op = filtros.opcoes()
 sel = filtros.sidebar(op)
@@ -56,6 +61,7 @@ c1, c2, c3, c4 = st.columns(4)
 d = deltas["fat"]
 ui.stat_tile(
     c1, "Faturamento Total", ui.fmt_compacto(fat_atual),
+    ajuda=definicoes.ajuda("faturamento_total"),
     serie=mensal["faturamento"], key="spark_fat",
     delta_texto=None if d is None else ui.fmt_pct(abs(d)),
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
@@ -63,6 +69,7 @@ ui.stat_tile(
 d = deltas["ticket"]
 ui.stat_tile(
     c2, "Ticket Médio", ui.fmt_moeda(ticket_atual, 2),
+    ajuda=definicoes.ajuda("ticket_medio"),
     serie=mensal["ticket_medio"], key="spark_ticket",
     delta_texto=None if d is None else ui.fmt_pct(abs(d)),
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
@@ -70,6 +77,7 @@ ui.stat_tile(
 d = deltas["ret"]
 ui.stat_tile(
     c3, "Taxa de Retenção", ui.fmt_pct(ret_atual),
+    ajuda=definicoes.ajuda("taxa_retencao"),
     serie=mensal["taxa_retencao"], key="spark_ret",
     delta_texto=None if d is None else f"{ui.fmt_num(abs(d), 1)} p.p.",
     subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
@@ -77,6 +85,7 @@ ui.stat_tile(
 d = deltas["churn"]
 ui.stat_tile(
     c4, "Churn Rate", ui.fmt_pct(churn_atual),
+    ajuda=definicoes.ajuda("churn_rate"),
     serie=mensal["churn_rate"], key="spark_churn",
     delta_texto=None if d is None else f"{ui.fmt_num(abs(d), 1)} p.p.",
     subiu=d is not None and d >= 0, bom=d is not None and d <= 0,

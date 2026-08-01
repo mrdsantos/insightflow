@@ -7,6 +7,7 @@ import streamlit as st
 st.set_page_config(page_title="InsightFlow - Clientes", layout="wide")
 
 import dados
+import definicoes
 import filtros
 import theme
 import ui
@@ -36,20 +37,24 @@ c1, c2, c3, c4 = st.columns(4)
 ui.stat_tile(
     c1, "Clientes Ativos (média mensal)",
     ui.fmt_num(mensal["clientes_ativos"].mean()),
+    ajuda=definicoes.ajuda("clientes_ativos"),
     serie=mensal["clientes_ativos"], key="spark_ativos",
 )
 ui.stat_tile(
     c2, "Novos no Período", ui.fmt_num(mensal["clientes_novos"].sum()),
+    ajuda=definicoes.ajuda("clientes_novos"),
     serie=mensal["clientes_novos"], key="spark_novos",
 )
 ui.stat_tile(
     c3, "Ticket Médio por Cliente",
     ui.fmt_moeda(mensal["faturamento"].sum() / mensal["clientes_ativos"].sum(), 2),
+    ajuda=definicoes.ajuda("ticket_medio_cliente"),
     serie=mensal["ticket_medio_cliente"], key="spark_ticket_cli",
 )
 ui.stat_tile(
     c4, "Receita no Top 10% de clientes",
     ui.fmt_pct(top10["pct_receita_top10"].iloc[0]),
+    ajuda=definicoes.ajuda("receita_top10"),
 )
 with c4:
     st.caption("Base completa de vendas concretizadas; não reage aos filtros.")
