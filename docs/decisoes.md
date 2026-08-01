@@ -80,6 +80,48 @@ janela por categoria, entao aceita so filtro de periodo e categoria: cortar UF e
 recalcular a janela no app, e logica analitica nao roda no dashboard. Cada grafico estrutural
 leva nota curta na interface.
 
+## Filtro global na sidebar, nao por grafico
+
+Uma unica barra de filtros para o dashboard inteiro, com estado preservado entre paginas
+via `st.session_state`. Filtro dentro do card ou por pagina quebra a comparacao: dois
+graficos passam a mostrar recortes diferentes sem avisar. E o mesmo padrao de Power BI e
+Tableau, e atende o requisito de "filtros dinamicos para navegacao e comparacao": navegar
+entre paginas mantendo o recorte e exatamente a comparacao. Os presets de periodo contam
+a partir da ultima venda da base, nao do relogio - o dataset e um snapshot congelado e
+"ultimos 30 dias" a partir de hoje retornaria vazio.
+
+## Pareto sem eixo duplo
+
+O Pareto classico poe barras de faturamento e linha de % acumulado em dois eixos Y, e o
+alinhamento entre as duas escalas e arbitrario - inventa cruzamentos que nao existem nos
+dados. Converti as barras para % do faturamento total: barras e linha passam a dividir a
+mesma escala 0-100 e nenhuma informacao se perde. Eixo duplo esta banido do projeto
+inteiro pelo mesmo motivo.
+
+## Dispersao RFM com 3 cores e resto cinza
+
+O RFM gera 10 segmentos nomeados, mas a dispersao destaca so Campeoes, Em Risco e
+Perdidos; o resto fica cinza. Dispersao e forma par-a-par, onde o teto validado da paleta
+e 3 series coloridas: com 10 cores haveria pares indistinguiveis sob daltonismo, e o
+segmento que importa sumiria no meio. Destacar pouco e mais legivel e mais afiado
+analiticamente. O mesmo principio vale para a matriz crescimento x faturamento de
+produtos (maior volume, maior crescimento, maior queda).
+
+## Tema claro fixo, sem modo escuro
+
+A paleta foi validada (daltonismo e contraste) contra superficie clara. Modo escuro
+exige uma segunda paleta com passos proprios validados contra a superficie escura - nao e
+inversao automatica. Fora do escopo desta entrega por decisao, nao por esquecimento.
+Toda cor do projeto vive em `app/theme.py` (template Plotly global) e
+`.streamlit/config.toml`; nenhum grafico declara cor propria.
+
+## O dashboard nao calcula nada em pandas
+
+As paginas so aplicam filtro (equivalente de WHERE) e agregacao trivial (soma, contagem,
+pivot). Janelas, quintis, percentuais acumulados e a definicao de churn vivem nas views
+versionadas em `sql/views/`. Se um numero do dashboard divergir do SQL, o erro e do app,
+nao da analise - e a view continua auditavel por quem nunca abriu o Python.
+
 ## Seed fixa no gerador
 
 `random.Random(SEED)` com seed constante no codigo. Duas execucoes geram o mesmo CSV
