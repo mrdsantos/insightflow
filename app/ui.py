@@ -10,6 +10,33 @@ import streamlit as st
 
 import theme
 
+# A modebar do Plotly e fixa em ingles no bundle. Sai sem perda: todo grafico
+# tem gemeo tabular, que e o caminho oficial para ler o valor.
+CONFIG_GRAFICO = {"displayModeBar": False}
+
+MESES = ["jan", "fev", "mar", "abr", "mai", "jun",
+         "jul", "ago", "set", "out", "nov", "dez"]
+
+
+def rotulo_mes(ano_mes: str) -> str:
+    """'2026-07' -> 'jul/2026'."""
+    return f"{MESES[int(ano_mes[5:]) - 1]}/{ano_mes[:4]}"
+
+
+def eixo_mes(ano_mes, passo: int = 1, como_data: bool = False) -> dict:
+    """Ticks de mes em pt-BR, para `fig.update_xaxes(**ui.eixo_mes(...))`.
+
+    Sem isso o Plotly rotula eixo de data no locale dele e sai "Jan 2026".
+    Com como_data=True os tickvals saem como Timestamp, para o eixo continuar
+    sendo datetime - a previsao depende disso por causa das linhas de fase.
+    """
+    meses = sorted(set(ano_mes))[::passo]
+    return dict(
+        tickmode="array",
+        tickvals=[pd.Timestamp(m + "-01") for m in meses] if como_data else meses,
+        ticktext=[rotulo_mes(m) for m in meses],
+    )
+
 
 def fmt_num(v: float, decimais: int = 0) -> str:
     s = f"{v:,.{decimais}f}"
@@ -60,7 +87,7 @@ def stat_tile(
             st.markdown(
                 f"<span style='color:{cor};font-size:0.9rem'>{seta} {delta_texto}"
                 f"</span> <span style='color:{theme.ROTULO_EIXO};font-size:0.8rem'>"
-                f"vs periodo anterior</span>",
+                f"vs período anterior</span>",
                 unsafe_allow_html=True,
             )
         if serie is not None and len(serie) > 1:
@@ -88,6 +115,6 @@ def gemeo_tabular(df: pd.DataFrame, rotulo: str = "Ver dados") -> None:
 
 def nota_estrutural() -> None:
     st.caption(
-        "Analise estrutural sobre a base completa de vendas concretizadas; "
-        "nao reage aos filtros da barra lateral."
+        "Análise estrutural sobre a base completa de vendas concretizadas; "
+        "não reage aos filtros da barra lateral."
     )

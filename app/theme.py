@@ -66,6 +66,8 @@ _eixo_padrao = dict(
 _template = go.layout.Template(
     layout=go.Layout(
         colorway=SLOTS,
+        # pt-BR: virgula decimal, ponto de milhar. Sem isso o hover sai 1,234,567.
+        separators=",.",
         paper_bgcolor=SUPERFICIE,
         plot_bgcolor=SUPERFICIE,
         font=dict(family=FONTE, color=TINTA, size=13),

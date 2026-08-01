@@ -1,25 +1,25 @@
 # InsightFlow
 
-Ciclo end-to-end de dados para um e-commerce simulado: geracao de dados brutos sujos,
-ETL com quarentena para PostgreSQL, analises em SQL, dashboard Streamlit multipagina e
-modelo preditivo de faturamento. Construido para o desafio Data Analytics do Projeto
+Ciclo end-to-end de dados para um e-commerce simulado: geração de dados brutos sujos,
+ETL com quarentena para PostgreSQL, análises em SQL, dashboard Streamlit multipágina e
+modelo preditivo de faturamento. Construído para o desafio Data Analytics do Projeto
 Desenvolve.
 
-Dashboard publico: https://insightflow.maiconsantos.com.br/
+Dashboard público: https://insightflow.maiconsantos.com.br/
 
-## Resultados em numeros
+## Resultados em números
 
-- 8.209 linhas brutas no CSV; 7.643 chegam ao fato, 445 (5,4%) vao para quarentena com
+- 8.209 linhas brutas no CSV; 7.643 chegam ao fato, 445 (5,4%) vão para quarentena com
   motivo registrado, 121 duplicatas descartadas.
-- R$ 6,07 milhoes de faturamento concretizado em 24 meses, com sazonalidade forte de
-  Black Friday (nov/2025 = R$ 500 mil, perto do dobro de um mes tipico).
+- R$ 6,07 milhões de faturamento concretizado em 24 meses, com sazonalidade forte de
+  Black Friday (nov/2025 = R$ 500 mil, perto do dobro de um mês típico).
 - 8 de 30 produtos concentram 80% do faturamento; o top 10% dos clientes concentra
   41,4% da receita; RFM nomeia 10 segmentos sobre 580 clientes ativos.
-- Previsao para jul/2026: ~R$ 321 mil (banda 207-435 mil). No teste temporal o baseline
-  de media movel bateu a regressao por pouco e ambos tiveram R2 negativo - o resultado
-  esta publicado como e, com a leitura critica no notebook 03 e na pagina de Previsao.
+- Previsão para jul/2026: ~R$ 321 mil (banda 207-435 mil). No teste temporal o baseline
+  de média móvel bateu a regressão por pouco e ambos tiveram R2 negativo - o resultado
+  está publicado como é, com a leitura crítica no notebook 03 e na página de Previsão.
 
-A narrativa completa esta em [docs/storytelling.md](docs/storytelling.md).
+A narrativa completa está em [docs/storytelling.md](docs/storytelling.md).
 
 ## Arquitetura
 
@@ -30,8 +30,8 @@ gerador (seed fixa) -> dados/ecom_data.csv -> ETL (pandas + psycopg)
     -> Streamlit multipagina (app/)
 ```
 
-Cada camada le apenas a anterior. O dashboard nao roda logica analitica propria: janela,
-quintil, percentual acumulado e churn vivem nas views; as paginas so filtram e agregam
+Cada camada lê apenas a anterior. O dashboard não roda lógica analítica própria: janela,
+quintil, percentual acumulado e churn vivem nas views; as páginas só filtram e agregam
 trivialmente. Star schema em `dw`: `dim_cliente`, `dim_produto`, `dim_localidade`,
 `dim_calendario`, `fato_vendas`, mais a tabela `quarentena` (registro rejeitado inteiro
 em JSONB + motivo). O modelo preditivo materializa `previsao_mensal` e `metricas_modelo`,
@@ -41,30 +41,30 @@ lidas pelo app via views como todo o resto.
 
 **Dados.** O enunciado pede um CSV simulado; o gerador (`src/gerador/`) produz 8.209
 linhas com seed fixa e sujeira parametrizada (nulos, duplicatas, quantidade negativa,
-datas e moedas em formatos mistos, variantes de caixa/acento, outliers de preco), para o
-ETL ter o que limpar de verdade. O CSV esta commitado e e reproduzivel byte a byte.
+datas e moedas em formatos mistos, variantes de caixa/acento, outliers de preço), para o
+ETL ter o que limpar de verdade. O CSV está commitado e é reproduzível byte a byte.
 
 **ETL (Sprint 1).** Full refresh idempotente: rodar duas vezes produz contagens
-identicas. Validacao antes de carga; registro invalido nao e descartado em silencio,
-vai para `dw.quarentena` com o motivo. Um relatorio de qualidade
-([docs/relatorio_qualidade.md](docs/relatorio_qualidade.md)) e regenerado a cada
-execucao. Funcoes puras de limpeza cobertas por pytest.
+idênticas. Validação antes de carga; registro inválido não é descartado em silêncio,
+vai para `dw.quarentena` com o motivo. Um relatório de qualidade
+([docs/relatorio_qualidade.md](docs/relatorio_qualidade.md)) é regenerado a cada
+execução. Funções puras de limpeza cobertas por pytest.
 
-**EDA e SQL (Sprint 2).** Estatisticas descritivas, correlacao (Pearson vs Spearman) e
-outliers (IQR vs z-score, com justificativa) no notebook 02. As metricas de negocio
-viram views com window functions: RFM por `NTILE(5)`, retencao por coorte, Pareto com
-acumulado, crescimento MoM/YoY por `LAG`. Definicoes que exigiram decisao (venda
-concretizada, churn de 90 dias) estao em [docs/decisoes.md](docs/decisoes.md).
+**EDA e SQL (Sprint 2).** Estatísticas descritivas, correlação (Pearson vs Spearman) e
+outliers (IQR vs z-score, com justificativa) no notebook 02. As métricas de negócio
+viram views com window functions: RFM por `NTILE(5)`, retenção por coorte, Pareto com
+acumulado, crescimento MoM/YoY por `LAG`. Definições que exigiram decisão (venda
+concretizada, churn de 90 dias) estão em [docs/decisoes.md](docs/decisoes.md).
 
-**Dashboard (Sprint 3).** Quatro paginas orientadas a pergunta de negocio, filtros
-globais na sidebar com estado preservado entre paginas, paleta unica validada em
-`app/theme.py`, todo grafico com gemeo tabular. Sem eixo duplo; o unico tracejado do
-projeto e a projecao do modelo, onde tracejado significa projecao.
+**Dashboard (Sprint 3).** Quatro páginas orientadas à pergunta de negócio, filtros
+globais na sidebar com estado preservado entre páginas, paleta única validada em
+`app/theme.py`, todo gráfico com gêmeo tabular. Sem eixo duplo; o único tracejado do
+projeto é a projeção do modelo, onde tracejado significa projeção.
 
-**Modelo (Sprint 4).** Serie mensal de faturamento, split temporal (18 meses de treino,
-6 de teste), baseline de media movel de 3 meses contra regressao linear com tendencia e
-dummies de mes, comparados por MAE, MAPE e R2. `src/modelo/treinar.py` replica o
-notebook de forma reprodutivel e materializa o resultado no banco.
+**Modelo (Sprint 4).** Série mensal de faturamento, split temporal (18 meses de treino,
+6 de teste), baseline de média móvel de 3 meses contra regressão linear com tendência e
+dummies de mês, comparados por MAE, MAPE e R2. `src/modelo/treinar.py` replica o
+notebook de forma reprodutível e materializa o resultado no banco.
 
 ## Como executar
 
@@ -83,7 +83,7 @@ python -m src.modelo.treinar      # treina e materializa a previsao
 streamlit run app/Home.py
 ```
 
-Testes: `pytest -q`. Para regenerar o CSV (opcional, o commitado e identico):
+Testes: `pytest -q`. Para regenerar o CSV (opcional, o commitado é idêntico):
 `python -m src.gerador.gerar_dados`.
 
 ### Docker
@@ -92,10 +92,10 @@ Testes: `pytest -q`. Para regenerar o CSV (opcional, o commitado e identico):
 docker compose up --build
 ```
 
-Sobe Postgres, aplica migracoes, roda ETL e treino, e serve o dashboard em
+Sobe Postgres, aplica migrações, roda ETL e treino, e serve o dashboard em
 `http://localhost:8501`.
 
-## Estrutura do repositorio
+## Estrutura do repositório
 
 ```
 src/gerador/      gerador do CSV sujo (seed fixa)
@@ -114,28 +114,28 @@ dados/            ecom_data.csv commitado
 
 ## Escopo do desafio
 
-As quatro sprints do enunciado estao cobertas; o mapeamento requisito a requisito, com
-arquivo e evidencia de cada item, esta em
+As quatro sprints do enunciado estão cobertas; o mapeamento requisito a requisito, com
+arquivo e evidência de cada item, está em
 [docs/rastreabilidade.md](docs/rastreabilidade.md).
 
 | Sprint | Entrega |
 |---|---|
-| 1 - Ingestao e ETL | `src/etl/`, `scripts/migrate.py`, `sql/ddl/`, notebook 01 |
+| 1 - Ingestão e ETL | `src/etl/`, `scripts/migrate.py`, `sql/ddl/`, notebook 01 |
 | 2 - EDA e SQL | notebook 02, `sql/views/`, `sql/consultas/` |
-| 3 - Dashboard | `app/` (4 paginas, KPIs, sazonalidade, filtros dinamicos) |
+| 3 - Dashboard | `app/` (4 páginas, KPIs, sazonalidade, filtros dinâmicos) |
 | 4 - Storytelling e modelo | notebook 03, `src/modelo/`, `docs/storytelling.md` |
 
-## Alem do escopo
+## Além do escopo
 
-Itens que o enunciado nao pede, construidos por decisao propria:
+Itens que o enunciado não pede, construídos por decisão própria:
 
-- **Quarentena com motivo**: linha invalida nao some, fica auditavel em `dw.quarentena`.
-- **Relatorio de qualidade automatico**: o pipeline regenera o antes/depois da limpeza
-  a cada execucao.
+- **Quarentena com motivo**: linha inválida não some, fica auditável em `dw.quarentena`.
+- **Relatório de qualidade automático**: o pipeline regenera o antes/depois da limpeza
+  a cada execução.
 - **Contrato de dados** ([docs/contrato-dados.md](docs/contrato-dados.md)): tabela que
-  liga cada elemento de tela a view que o alimenta - nenhuma view orfa, nenhum elemento
+  liga cada elemento de tela à view que o alimenta - nenhuma view órfã, nenhum elemento
   sem fonte.
-- **Coluna `ID_Pedido` no gerador**: desvio consciente do enunciado para dar nocao de
-  pedido a base (registrado em [docs/decisoes.md](docs/decisoes.md)).
-- **Registro de decisoes**: cada escolha questionavel tem secao propria em
-  `docs/decisoes.md`, com o porque.
+- **Coluna `ID_Pedido` no gerador**: desvio consciente do enunciado para dar noção de
+  pedido à base (registrado em [docs/decisoes.md](docs/decisoes.md)).
+- **Registro de decisões**: cada escolha questionável tem seção própria em
+  `docs/decisoes.md`, com o porquê.

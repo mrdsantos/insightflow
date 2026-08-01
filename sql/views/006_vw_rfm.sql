@@ -39,13 +39,13 @@ SELECT
     score_m,
     -- grade R x F, primeira condicao que casa vence; particao completa dos 25 pares
     CASE
-        WHEN score_r >= 4 AND score_f >= 4 THEN 'Campeoes'
+        WHEN score_r >= 4 AND score_f >= 4 THEN 'Campeões'
         WHEN score_r >= 4 AND score_f >= 2 THEN 'Potenciais leais'
         WHEN score_r >= 4                  THEN 'Novos'
         WHEN score_r = 3  AND score_f >= 4 THEN 'Leais'
-        WHEN score_r = 3  AND score_f >= 2 THEN 'Precisam de atencao'
+        WHEN score_r = 3  AND score_f >= 2 THEN 'Precisam de atenção'
         WHEN score_r = 3                   THEN 'Promissores'
-        WHEN score_f >= 4                  THEN 'Nao pode perder'
+        WHEN score_f >= 4                  THEN 'Não pode perder'
         WHEN score_f >= 2                  THEN 'Em Risco'
         WHEN score_r = 2                   THEN 'Prestes a dormir'
         ELSE 'Perdidos'

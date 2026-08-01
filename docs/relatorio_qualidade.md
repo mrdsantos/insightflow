@@ -1,14 +1,14 @@
-# Relatorio de qualidade dos dados
+# Relatório de qualidade dos dados
 
-Gerado pelo pipeline a cada execucao - nao editar na mao. Sem timestamp de proposito: execucao identica gera arquivo identico.
+Gerado pelo pipeline a cada execução - não editar na mão. Sem timestamp de propósito: execução idêntica gera arquivo idêntico.
 
-## Visao geral
+## Visão geral
 
-| Metrica | Valor |
+| Métrica | Valor |
 |---|---|
 | Linhas no CSV / staging | 8209 |
-| Linhas validas carregadas no fato | 7643 |
-| Linhas rejeitadas (quarentena) | 445 (5.4%) |
+| Linhas válidas carregadas no fato | 7643 |
+| Linhas rejeitadas (quarentena) | 445 (5,4%) |
 | Duplicatas de id_transacao descartadas | 121 |
 | Clientes / produtos / localidades distintos | 603 / 30 / 15 |
 
@@ -24,7 +24,7 @@ Gerado pelo pipeline a cada execucao - nao editar na mao. Sem timestamp de propo
 | nome_produto | 48 |
 | valor_unitario | 42 |
 
-### Formatos de data em circulacao
+### Formatos de data em circulação
 
 | Formato | Linhas |
 |---|---|
@@ -34,7 +34,7 @@ Gerado pelo pipeline a cada execucao - nao editar na mao. Sem timestamp de propo
 | nulo | 58 |
 | invalido | 43 |
 
-### Formas de moeda em circulacao
+### Formas de moeda em circulação
 
 | Forma | Linhas |
 |---|---|
@@ -44,17 +44,17 @@ Gerado pelo pipeline a cada execucao - nao editar na mao. Sem timestamp de propo
 | nulo | 42 |
 | invalido | 29 |
 
-### Inconsistencias de texto
+### Inconsistências de texto
 
-- Categorias distintas antes da normalizacao: 20
-- Status distintos antes da normalizacao: 18
+- Categorias distintas antes da normalização: 20
+- Status distintos antes da normalização: 18
 
 ## Depois da limpeza
 
 - Categorias distintas no dw: 6
 - Status distintos no dw: 5
-- Nulos em campo chave no fato: 0 (barrados na validacao)
-- Datas e valores: tipados (DATE / NUMERIC), um formato so
+- Nulos em campo chave no fato: 0 (barrados na validação)
+- Datas e valores: tipados (DATE / NUMERIC), um formato só
 
 ## Quarentena por motivo
 

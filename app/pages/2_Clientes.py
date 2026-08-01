@@ -11,7 +11,7 @@ import filtros
 import theme
 import ui
 
-st.title("Quem sao meus clientes e quais estao em risco?")
+st.title("Quem são meus clientes e quais estão em risco?")
 
 op = filtros.opcoes()
 sel = filtros.sidebar(op)
@@ -34,16 +34,16 @@ RAMPA = [[i / (len(theme.RAMPA_AZUL) - 1), cor] for i, cor in enumerate(theme.RA
 mensal = kpis_per.sort_values("ano_mes")
 c1, c2, c3, c4 = st.columns(4)
 ui.stat_tile(
-    c1, "Clientes Ativos (media mensal)",
+    c1, "Clientes Ativos (média mensal)",
     ui.fmt_num(mensal["clientes_ativos"].mean()),
     serie=mensal["clientes_ativos"], key="spark_ativos",
 )
 ui.stat_tile(
-    c2, "Novos no Periodo", ui.fmt_num(mensal["clientes_novos"].sum()),
+    c2, "Novos no Período", ui.fmt_num(mensal["clientes_novos"].sum()),
     serie=mensal["clientes_novos"], key="spark_novos",
 )
 ui.stat_tile(
-    c3, "Ticket Medio por Cliente",
+    c3, "Ticket Médio por Cliente",
     ui.fmt_moeda(mensal["faturamento"].sum() / mensal["clientes_ativos"].sum(), 2),
     serie=mensal["ticket_medio_cliente"], key="spark_ticket_cli",
 )
@@ -52,9 +52,9 @@ ui.stat_tile(
     ui.fmt_pct(top10["pct_receita_top10"].iloc[0]),
 )
 with c4:
-    st.caption("Base completa de vendas concretizadas; nao reage aos filtros.")
+    st.caption("Base completa de vendas concretizadas; não reage aos filtros.")
 
-aba_seg, aba_ret = st.tabs(["Segmentacao", "Retencao"])
+aba_seg, aba_ret = st.tabs(["Segmentação", "Retenção"])
 
 
 # ---- Aba Segmentacao --------------------------------------------------------
@@ -80,13 +80,13 @@ with aba_seg:
         )
     )
     fig.update_layout(
-        title="Matriz RFM: clientes por Recencia x Frequencia",
-        xaxis_title="Score de recencia (5 = comprou ha pouco)",
-        yaxis_title="Score de frequencia (5 = compra mais)",
+        title="Matriz RFM: clientes por Recência x Frequência",
+        xaxis_title="Score de recência (5 = comprou há pouco)",
+        yaxis_title="Score de frequência (5 = compra mais)",
         height=420,
     )
     with col_esq:
-        st.plotly_chart(fig, width="stretch", key="rfm_heatmap")
+        st.plotly_chart(fig, width="stretch", key="rfm_heatmap", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(
             grade.reset_index().rename(columns={"score_f": "score_f \\ score_r"})
         )
@@ -105,7 +105,7 @@ with aba_seg:
     )
     fig.update_layout(title="Clientes por segmento RFM", height=420)
     with col_dir:
-        st.plotly_chart(fig, width="stretch", key="rfm_segmentos")
+        st.plotly_chart(fig, width="stretch", key="rfm_segmentos", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(seg.sort_values("clientes", ascending=False).reset_index())
 
     fig = go.Figure(
@@ -118,7 +118,7 @@ with aba_seg:
     fig.update_layout(title="Receita por segmento RFM", height=420)
     col_esq2, col_dir2 = st.columns(2)
     with col_esq2:
-        st.plotly_chart(fig, width="stretch", key="rfm_receita")
+        st.plotly_chart(fig, width="stretch", key="rfm_receita", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(
             seg.sort_values("receita", ascending=False).reset_index()[
                 ["segmento", "receita"]
@@ -129,7 +129,7 @@ with aba_seg:
     # Dispersao e forma par-a-par: teto de 3 series coloridas; colorir os 10
     # segmentos enterraria justamente os que importam.
     DESTAQUES = {
-        "Campeoes": theme.AZUL,
+        "Campeões": theme.AZUL,
         "Em Risco": theme.LARANJA,
         "Perdidos": theme.AQUA,
     }
@@ -139,24 +139,24 @@ with aba_seg:
         x=resto["recencia_dias"], y=resto["monetario"], mode="markers",
         name="Demais segmentos",
         marker=dict(color=theme.CINZA, size=7, opacity=0.6),
-        hovertemplate="recencia %{x} dias, R$ %{y:,.0f}<extra>outros</extra>",
+        hovertemplate="recência %{x} dias, R$ %{y:,.0f}<extra>outros</extra>",
     )
     for segmento, cor in DESTAQUES.items():
         d = rfm[rfm["segmento"] == segmento]
         fig.add_scatter(
             x=d["recencia_dias"], y=d["monetario"], mode="markers",
             name=segmento, marker=dict(color=cor, size=9),
-            hovertemplate="recencia %{x} dias, R$ %{y:,.0f}<extra>" + segmento + "</extra>",
+            hovertemplate="recência %{x} dias, R$ %{y:,.0f}<extra>" + segmento + "</extra>",
         )
     fig.update_layout(
-        title="Recencia x Valor monetario por cliente",
-        xaxis_title="Dias desde a ultima compra",
+        title="Recência x Valor monetário por cliente",
+        xaxis_title="Dias desde a última compra",
         yaxis_title="Receita total do cliente (R$)",
         height=460,
         hoverdistance=24,
     )
     with col_dir2:
-        st.plotly_chart(fig, width="stretch", key="rfm_dispersao")
+        st.plotly_chart(fig, width="stretch", key="rfm_dispersao", config=ui.CONFIG_GRAFICO)
         ui.gemeo_tabular(rfm)
 
 
@@ -173,21 +173,21 @@ with aba_ret:
         go.Heatmap(
             z=matriz.values,
             x=[str(c) for c in matriz.columns],
-            y=matriz.index.tolist(),
+            y=[ui.rotulo_mes(m) for m in matriz.index],
             colorscale=RAMPA,
             zmin=0, zmax=100,
             colorbar=dict(title="% retido", outlinewidth=0),
-            hovertemplate="coorte %{y}, mes %{x}: %{z}%<extra></extra>",
+            hovertemplate="coorte %{y}, mês %{x}: %{z}%<extra></extra>",
         )
     )
     fig.update_layout(
-        title="Retencao por coorte de primeira compra",
+        title="Retenção por coorte de primeira compra",
         xaxis_title="Meses desde a primeira compra",
-        yaxis_title="Coorte (mes da primeira compra)",
+        yaxis_title="Coorte (mês da primeira compra)",
         yaxis_autorange="reversed",
         height=560,
     )
-    st.plotly_chart(fig, width="stretch", key="coorte_heatmap")
+    st.plotly_chart(fig, width="stretch", key="coorte_heatmap", config=ui.CONFIG_GRAFICO)
     ui.gemeo_tabular(coorte)
 
     fig = go.Figure(
@@ -197,10 +197,10 @@ with aba_ret:
         )
     )
     fig.update_layout(
-        title="Curva media de retencao",
+        title="Curva média de retenção",
         xaxis_title="Meses desde a primeira compra",
-        yaxis_title="% medio retido",
+        yaxis_title="% médio retido",
         height=380,
     )
-    st.plotly_chart(fig, width="stretch", key="curva_retencao")
+    st.plotly_chart(fig, width="stretch", key="curva_retencao", config=ui.CONFIG_GRAFICO)
     ui.gemeo_tabular(curva)
