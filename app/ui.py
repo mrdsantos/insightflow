@@ -63,6 +63,8 @@ def stat_tile(
     col,
     titulo: str,
     valor: str,
+    *,
+    ajuda: str | None = None,
     serie: pd.Series | None = None,
     delta_texto: str | None = None,
     subiu: bool = True,
@@ -73,9 +75,10 @@ def stat_tile(
 
     Para um numero unico, o numero e o grafico - por isso tile e nao barra.
     As cores de status valem so para o delta, nunca para series.
+    O texto de `ajuda` vira o tooltip do titulo; sem ele o Streamlit nao desenha icone.
     """
     with col.container(border=True):
-        st.caption(titulo)
+        st.caption(titulo, help=ajuda)
         st.markdown(
             f"<div style='font-size:1.7rem;font-weight:600;line-height:1.15;"
             f"color:{theme.TINTA}'>{valor}</div>",
@@ -118,3 +121,8 @@ def nota_estrutural() -> None:
         "Análise estrutural sobre a base completa de vendas concretizadas; "
         "não reage aos filtros da barra lateral."
     )
+
+
+def leitura(texto: str) -> None:
+    """Frase de conclusao sob um grafico. Slot fixo: abaixo do chart, acima do gemeo."""
+    st.caption(texto)
