@@ -5,7 +5,7 @@ ETL com quarentena para PostgreSQL, analises em SQL, dashboard Streamlit multipa
 modelo preditivo de faturamento. Construido para o desafio Data Analytics do Programa
 Desenvolve.
 
-Dashboard publico: link adicionado apos o deploy.
+Dashboard publico: https://insightflow.maiconsantos.com.br/
 
 ## Resultados em numeros
 

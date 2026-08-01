@@ -37,7 +37,7 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 | 2. Graficos de series temporais para analise de sazonalidade | `app/Home.py`: serie de faturamento mensal (tendencia) e sazonalidade ano a ano sobreposta (uma linha por ano); small multiples de MoM por categoria em `app/pages/3_Produtos.py` | ok |
 | 3. Filtros dinamicos para navegacao e comparacao de resultados | `app/filtros.py`: sidebar global (periodo com presets, categoria, UF, status) com estado preservado entre paginas via `st.session_state`; a navegacao mantendo o recorte e a comparacao. Views estruturais nao reagem por decisao registrada em `docs/decisoes.md` e `docs/contrato-dados.md` | ok |
 | Ferramenta de BI: bibliotecas Python (Streamlit/Dash) aceitas pelo enunciado | Streamlit + Plotly; corte do Power BI justificado em `docs/decisoes.md`. Tema e paleta centralizados em `app/theme.py` e `.streamlit/config.toml` | ok |
-| Entrega 4: link publico do dashboard | Dockerfile e docker-compose.yml prontos; deploy no Dokploy agendado (nao bloqueia o bloco 4) | parcial |
+| Entrega 4: link publico do dashboard | Publicado em https://insightflow.maiconsantos.com.br/ via Dokploy (Docker Swarm), imagem construida pelo `Dockerfile`; link no topo do README | ok |
 | `st.cache_data` nas queries (requisito do plano) | `app/dados.py`: `ler_view` com `st.cache_data(ttl=600)` e engine unica via `st.cache_resource` | ok |
 | Pagina Previsao | `app/pages/4_Previsao.py` completa na Sprint 4: KPIs, historico + ajuste + projecao tracejada com banda, tabela modelo vs baseline, leitura do resultado | ok |
 
@@ -57,7 +57,7 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 | 1. Repositorio no GitHub | `github.com/mrdsantos/insightflow`, publico, com PRs e milestones por sprint | ok |
 | 2. Scripts e notebooks das Sprints 1, 2 e 4 | `src/`, `scripts/`, `sql/`, `notebooks/01`, `02`, `03` | ok |
 | 3. requirements.txt e instrucoes de execucao | `requirements.txt` (versoes pinadas) + secao Como executar do README | ok |
-| 4. Link publico ou dashboard local | Dashboard local via venv ou `docker compose up --build`; link publico via Dokploy | parcial |
+| 4. Link publico ou dashboard local | Link publico em https://insightflow.maiconsantos.com.br/; dashboard local via venv ou `docker compose up --build` | ok |
 | 5. Dados: CSV e script de geracao | `dados/ecom_data.csv` commitado + `src/gerador/gerar_dados.py` com seed fixa | ok |
 
 ## Criterios de avaliacao
