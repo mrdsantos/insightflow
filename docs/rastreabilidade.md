@@ -31,7 +31,15 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 
 ## Sprint 3 - Visualizacao e Dashboard
 
-Pendente - inicia no bloco 3.
+| Requisito | Entrega | Status |
+|---|---|---|
+| 1. Dashboard com KPIs principais (Faturamento Total, Ticket Medio, Churn Rate ou Taxa de Retencao) | Streamlit multipage em `app/`; `app/Home.py` traz os 4 KPIs em stat tiles com delta vs periodo anterior e sparkline, lidos de `dw.vw_kpis_mensais`. Paginas Clientes e Produtos com linhas de KPI proprias | ok |
+| 2. Graficos de series temporais para analise de sazonalidade | `app/Home.py`: serie de faturamento mensal (tendencia) e sazonalidade ano a ano sobreposta (uma linha por ano); small multiples de MoM por categoria em `app/pages/3_Produtos.py` | ok |
+| 3. Filtros dinamicos para navegacao e comparacao de resultados | `app/filtros.py`: sidebar global (periodo com presets, categoria, UF, status) com estado preservado entre paginas via `st.session_state`; a navegacao mantendo o recorte e a comparacao. Views estruturais nao reagem por decisao registrada em `docs/decisoes.md` e `docs/contrato-dados.md` | ok |
+| Ferramenta de BI: bibliotecas Python (Streamlit/Dash) aceitas pelo enunciado | Streamlit + Plotly; corte do Power BI justificado em `docs/decisoes.md`. Tema e paleta centralizados em `app/theme.py` e `.streamlit/config.toml` | ok |
+| Entrega 4: link publico do dashboard | Dockerfile e docker-compose.yml prontos; deploy no Dokploy agendado (nao bloqueia o bloco 4) | parcial |
+| `st.cache_data` nas queries (requisito do plano) | `app/dados.py`: `ler_view` com `st.cache_data(ttl=600)` e engine unica via `st.cache_resource` | ok |
+| Pagina Previsao | Esqueleto em `app/pages/4_Previsao.py`; conteudo e entrega da Sprint 4 (consome saida do modelo) | parcial |
 
 ## Sprint 4 - Storytelling e Modelo Preditivo
 
