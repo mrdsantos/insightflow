@@ -103,11 +103,11 @@ src/etl/          pipeline: validacao, limpeza, carga
 src/modelo/       treino e materializacao da previsao
 scripts/          migrate.py (database + DDL + views, idempotente)
 sql/ddl/          esquemas, dimensoes, fato, quarentena, tabelas do modelo
-sql/views/        12 views consumidas pelo dashboard (contrato de dados)
+sql/views/        12 views consumidas pelo dashboard, prefixadas na ordem de dependencia
 sql/consultas/    SQL de apoio dos notebooks
 notebooks/        01 qualidade, 02 EDA, 03 modelo
 app/              Streamlit multipagina (theme, dados, filtros, ui, paginas)
-tests/            pytest das funcoes puras de limpeza
+tests/            pytest das funcoes puras de limpeza e da ordem das views
 docs/             decisoes, storytelling, rastreabilidade, contrato de dados
 dados/            ecom_data.csv commitado
 ```

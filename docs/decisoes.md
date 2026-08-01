@@ -138,3 +138,20 @@ Analise completa no notebook 03.
 `random.Random(SEED)` com seed constante no codigo. Duas execucoes geram o mesmo CSV
 byte a byte, o que torna o dataset commitado reproduzivel por qualquer avaliador e faz
 da carga remota uma reproducao exata da local, nao um retrabalho.
+
+## Arquivos de view com prefixo numerico
+
+`sql/views/` seguia a convencao de um arquivo por view com o nome da view, e o
+`scripts/migrate.py` aplicava tudo em ordem alfabetica. So que `vw_vendas` e a base de que
+onze das doze views leem, e `vw_vendas.sql` era o ultimo nome do alfabeto: o primeiro arquivo
+aplicado ja fazia `FROM dw.vw_vendas`. Isso nunca falhou aqui porque o banco local ganhou as
+views uma a uma ao longo dos blocos 2 a 4, e reaplicar `CREATE OR REPLACE` sobre view que ja
+existe funciona. Em banco zerado - a VPS, o `docker compose` com volume novo, o avaliador
+clonando o repo - quebrava sempre.
+
+Adotei o prefixo numerico que `sql/ddl/` ja usava, agora refletindo a ordem de dependencia
+entre as views. O `sorted()` do migrate continua sendo a unica regra de ordenacao, sem codigo
+novo. A alternativa era manter os nomes e listar a ordem dentro do `migrate.py`, mas ai uma
+view nova que ficasse de fora da lista seria ignorada em silencio, falha pior que a original,
+que ao menos estourava. `tests/test_ordem_views.py` le os arquivos na mesma ordem do migrate
+e falha se alguma view referenciar outra ainda nao criada.

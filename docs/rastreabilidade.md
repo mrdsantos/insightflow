@@ -64,7 +64,7 @@ cada sprint. Status: `ok` (entregue), `parcial`, `pendente`.
 
 | Criterio (peso) | Onde esta a evidencia |
 |---|---|
-| Qualidade do ETL (30%) | `src/etl/` (validacao com quarentena por motivo, limpeza multiformato, full refresh idempotente), `sql/ddl/` (star schema com PKs, FKs, indices), `docs/relatorio_qualidade.md`, `tests/test_limpeza.py` |
+| Qualidade do ETL (30%) | `src/etl/` (validacao com quarentena por motivo, limpeza multiformato, full refresh idempotente), `sql/ddl/` (star schema com PKs, FKs, indices), `docs/relatorio_qualidade.md`, `tests/test_limpeza.py`, `tests/test_ordem_views.py` (migracao aplica em banco zerado) |
 | Analise de Dados (35%) | Notebooks 01-03; window functions em `sql/views/` (LAG, NTILE, SUM OVER, FILTER); correlacao e outliers com escolha justificada; RFM, coorte e churn definidos a partir dos dados; modelo com baseline e leitura critica |
 | Visualizacao (25%) | `app/`: 4 paginas orientadas a pergunta, KPIs do enunciado, series com sazonalidade, filtros globais persistentes, paleta unica validada, gemeo tabular em todo grafico, sem eixo duplo |
 | Documentacao (10%) | `README.md`, `docs/storytelling.md`, `docs/decisoes.md`, `docs/contrato-dados.md`, este arquivo |
