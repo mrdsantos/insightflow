@@ -2,7 +2,7 @@
 
 Ciclo end-to-end de dados para um e-commerce simulado: geracao de dados brutos sujos,
 ETL com quarentena para PostgreSQL, analises em SQL, dashboard Streamlit multipagina e
-modelo preditivo de faturamento. Construido para o desafio Data Analytics do Programa
+modelo preditivo de faturamento. Construido para o desafio Data Analytics do Projeto
 Desenvolve.
 
 Dashboard publico: https://insightflow.maiconsantos.com.br/
