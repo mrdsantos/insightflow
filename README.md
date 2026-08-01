@@ -92,7 +92,7 @@ Testes: `pytest -q`. Para regenerar o CSV (opcional, o commitado e identico):
 docker compose up --build
 ```
 
-Sobe Postgres, aplica migracoes, roda ETL e treino e serve o dashboard em
+Sobe Postgres, aplica migracoes, roda ETL e treino, e serve o dashboard em
 `http://localhost:8501`.
 
 ## Estrutura do repositorio
