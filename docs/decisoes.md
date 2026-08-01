@@ -155,3 +155,16 @@ novo. A alternativa era manter os nomes e listar a ordem dentro do `migrate.py`,
 view nova que ficasse de fora da lista seria ignorada em silencio, falha pior que a original,
 que ao menos estourava. `tests/test_ordem_views.py` le os arquivos na mesma ordem do migrate
 e falha se alguma view referenciar outra ainda nao criada.
+
+## Titulo ancorado no container, faixa superior de 76px
+
+Com `margin.t = 48`, o titulo (que por padrao se centra no meio da margem superior) e a legenda
+horizontal (ancorada logo acima da area de plotagem) disputavam a mesma faixa de pixels e se
+sobrepunham nos cinco graficos com legenda. Passei o titulo para `yref="container"` com
+`yanchor="top"`, o que o prende ao topo da figura independentemente da altura da margem, e abri a
+faixa superior para 76px - o suficiente para titulo e legenda empilhados.
+
+A margem maior vale para todo grafico, inclusive os sem legenda. Aumentar so onde ha legenda
+economizaria espaco em branco, mas desalinharia as areas de plotagem de graficos lado a lado
+(na Home, sazonalidade tem legenda e categorias nao, e as duas dividem a mesma linha). Alinhamento
+entre paineis vizinhos vale mais que 28px de altura.

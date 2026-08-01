@@ -69,7 +69,17 @@ _template = go.layout.Template(
         paper_bgcolor=SUPERFICIE,
         plot_bgcolor=SUPERFICIE,
         font=dict(family=FONTE, color=TINTA, size=13),
-        title=dict(font=dict(size=15, color=TINTA), x=0, xanchor="left"),
+        # Titulo preso ao topo da figura, nao ao meio da margem: com y automatico
+        # ele caia na mesma faixa da legenda horizontal e os dois se sobrepunham.
+        title=dict(
+            font=dict(size=15, color=TINTA),
+            x=0,
+            xanchor="left",
+            yref="container",
+            y=1.0,
+            yanchor="top",
+            pad=dict(t=12),
+        ),
         xaxis=_eixo_padrao,
         yaxis=_eixo_padrao,
         legend=dict(
@@ -85,7 +95,9 @@ _template = go.layout.Template(
             bordercolor=EIXO,
             font=dict(family=FONTE, color=TINTA, size=12),
         ),
-        margin=dict(l=8, r=8, t=48, b=8),
+        # Faixa superior larga o bastante para titulo e legenda empilhados, uniforme
+        # em todo grafico para as areas de plotagem lado a lado nao desalinharem.
+        margin=dict(l=8, r=8, t=76, b=8),
     )
 )
 

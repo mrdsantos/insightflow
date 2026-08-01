@@ -94,8 +94,9 @@ fig.add_scatter(
 for fase, inicio in [("teste", teste["ano_mes"].iloc[0]), ("projecao", futuro["ano_mes"].iloc[0])]:
     x = pd.Timestamp(inicio + "-01")
     fig.add_vline(x=x, line_color=theme.GRADE, line_width=1)
+    # rotulo por dentro do grafico: ancorado por baixo ele subia para a faixa da legenda
     fig.add_annotation(
-        x=x, y=1.0, yref="paper", yanchor="bottom", xanchor="left",
+        x=x, y=1.0, yref="paper", yanchor="top", xanchor="left",
         text=fase, showarrow=False, font=dict(color=theme.ROTULO_EIXO, size=11),
     )
 fig.update_layout(
