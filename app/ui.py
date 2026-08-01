@@ -14,6 +14,17 @@ import theme
 # tem gemeo tabular, que e o caminho oficial para ler o valor.
 CONFIG_GRAFICO = {"displayModeBar": False}
 
+
+def grafico(fig, *, key: str) -> None:
+    """Aplica o template do modo corrente e renderiza. Unico caminho de grafico.
+
+    O template vem por figura, e nao de `pio.templates.default`, porque o default
+    e do processo e o tema e da sessao: dois usuarios em modos diferentes se
+    pintariam um ao outro.
+    """
+    fig.update_layout(template=theme.paleta().TEMPLATE)
+    st.plotly_chart(fig, width="stretch", key=key, config=CONFIG_GRAFICO)
+
 MESES = ["jan", "fev", "mar", "abr", "mai", "jun",
          "jul", "ago", "set", "out", "nov", "dez"]
 
@@ -77,19 +88,20 @@ def stat_tile(
     As cores de status valem so para o delta, nunca para series.
     O texto de `ajuda` vira o tooltip do titulo; sem ele o Streamlit nao desenha icone.
     """
+    cores = theme.paleta()
     with col.container(border=True):
         st.caption(titulo, help=ajuda)
         st.markdown(
             f"<div style='font-size:1.7rem;font-weight:600;line-height:1.15;"
-            f"color:{theme.TINTA}'>{valor}</div>",
+            f"color:{cores.TINTA}'>{valor}</div>",
             unsafe_allow_html=True,
         )
         if delta_texto is not None:
-            cor = theme.STATUS_BOM if bom else theme.STATUS_CRITICO
+            cor = cores.STATUS_BOM if bom else cores.STATUS_CRITICO
             seta = "&#8593;" if subiu else "&#8595;"
             st.markdown(
                 f"<span style='color:{cor};font-size:0.9rem'>{seta} {delta_texto}"
-                f"</span> <span style='color:{theme.ROTULO_EIXO};font-size:0.8rem'>"
+                f"</span> <span style='color:{cores.ROTULO_EIXO};font-size:0.8rem'>"
                 f"vs período anterior</span>",
                 unsafe_allow_html=True,
             )
@@ -97,10 +109,11 @@ def stat_tile(
             fig = go.Figure(
                 go.Scatter(
                     y=serie, mode="lines",
-                    line=dict(color=theme.AZUL, width=2), hoverinfo="skip",
+                    line=dict(color=cores.AZUL, width=2), hoverinfo="skip",
                 )
             )
             fig.update_layout(
+                template=cores.TEMPLATE,
                 height=48, margin=dict(l=0, r=0, t=2, b=2), showlegend=False,
                 xaxis=dict(visible=False), yaxis=dict(visible=False),
                 paper_bgcolor=theme.TRANSPARENTE, plot_bgcolor=theme.TRANSPARENTE,

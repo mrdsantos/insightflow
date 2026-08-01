@@ -12,6 +12,8 @@ import filtros
 import theme
 import ui
 
+cores = theme.paleta()
+
 st.title("Quem são meus clientes e quais estão em risco?")
 
 op = filtros.opcoes()
@@ -27,7 +29,7 @@ if kpis_per.empty:
     st.warning("Nenhum dado no recorte selecionado. Ajuste os filtros.")
     st.stop()
 
-RAMPA = [[i / (len(theme.RAMPA_AZUL) - 1), cor] for i, cor in enumerate(theme.RAMPA_AZUL)]
+RAMPA = [[i / (len(cores.RAMPA_AZUL) - 1), cor] for i, cor in enumerate(cores.RAMPA_AZUL)]
 
 
 # ---- KPIs -------------------------------------------------------------------
@@ -91,7 +93,7 @@ with aba_seg:
         height=420,
     )
     with col_esq:
-        st.plotly_chart(fig, width="stretch", key="rfm_heatmap", config=ui.CONFIG_GRAFICO)
+        ui.grafico(fig, key="rfm_heatmap")
         ui.leitura(
             "A massa fica nos extremos da diagonal: 55 clientes em R5 F5 e 39 em R1 F1. "
             "Cada faixa tem 116 clientes por construção do NTILE(5), que reparte "
@@ -110,12 +112,12 @@ with aba_seg:
     fig = go.Figure(
         go.Bar(
             x=seg["clientes"], y=seg.index, orientation="h",
-            marker_color=theme.AZUL, showlegend=False,
+            marker_color=cores.AZUL, showlegend=False,
         )
     )
     fig.update_layout(title="Clientes por segmento RFM", height=420)
     with col_dir:
-        st.plotly_chart(fig, width="stretch", key="rfm_segmentos", config=ui.CONFIG_GRAFICO)
+        ui.grafico(fig, key="rfm_segmentos")
         ui.leitura(
             "Campeões, com 135 clientes, é o maior grupo. Somados a Em Risco (105) e "
             "Perdidos (39), os três segmentos acionáveis cobrem 279 dos 580 clientes."
@@ -126,13 +128,13 @@ with aba_seg:
         go.Bar(
             x=seg.sort_values("receita")["receita"],
             y=seg.sort_values("receita").index,
-            orientation="h", marker_color=theme.AZUL, showlegend=False,
+            orientation="h", marker_color=cores.AZUL, showlegend=False,
         )
     )
     fig.update_layout(title="Receita por segmento RFM", height=420)
     col_esq2, col_dir2 = st.columns(2)
     with col_esq2:
-        st.plotly_chart(fig, width="stretch", key="rfm_receita", config=ui.CONFIG_GRAFICO)
+        ui.grafico(fig, key="rfm_receita")
         ui.leitura(
             "A ordem por receita não é a ordem por tamanho. Leais são 39 clientes e "
             "rendem R$ 656 mil; Em Risco são 105 e rendem R$ 566 mil. Campeões, "
@@ -148,16 +150,16 @@ with aba_seg:
     # Dispersao e forma par-a-par: teto de 3 series coloridas; colorir os 10
     # segmentos enterraria justamente os que importam.
     DESTAQUES = {
-        "Campeões": theme.AZUL,
-        "Em Risco": theme.LARANJA,
-        "Perdidos": theme.AQUA,
+        "Campeões": cores.AZUL,
+        "Em Risco": cores.LARANJA,
+        "Perdidos": cores.AQUA,
     }
     fig = go.Figure()
     resto = rfm[~rfm["segmento"].isin(DESTAQUES)]
     fig.add_scatter(
         x=resto["recencia_dias"], y=resto["monetario"], mode="markers",
         name="Demais segmentos",
-        marker=dict(color=theme.CINZA, size=7, opacity=0.6),
+        marker=dict(color=cores.CINZA, size=7, opacity=0.6),
         hovertemplate="recência %{x} dias, R$ %{y:,.0f}<extra>outros</extra>",
     )
     for segmento, cor in DESTAQUES.items():
@@ -175,7 +177,7 @@ with aba_seg:
         hoverdistance=24,
     )
     with col_dir2:
-        st.plotly_chart(fig, width="stretch", key="rfm_dispersao", config=ui.CONFIG_GRAFICO)
+        ui.grafico(fig, key="rfm_dispersao")
         ui.leitura(
             "Os 105 Em Risco ficam à direita e no alto: já gastaram bem e pararam de "
             "comprar. É dinheiro parado, e o melhor retorno esperado de uma campanha "
@@ -211,7 +213,7 @@ with aba_ret:
         yaxis_autorange="reversed",
         height=560,
     )
-    st.plotly_chart(fig, width="stretch", key="coorte_heatmap", config=ui.CONFIG_GRAFICO)
+    ui.grafico(fig, key="coorte_heatmap")
     ui.leitura(
         "A queda inteira acontece no primeiro mês: nas 24 coortes ela vai de 17,6% a "
         "55,6% de retenção. Depois disso as linhas descem devagar, e comparar coortes "
@@ -222,7 +224,7 @@ with aba_ret:
     fig = go.Figure(
         go.Scatter(
             x=curva["meses_desde"], y=curva["pct_medio"], mode="lines",
-            line=dict(color=theme.AZUL, width=2), showlegend=False,
+            line=dict(color=cores.AZUL, width=2), showlegend=False,
         )
     )
     fig.update_layout(
@@ -231,7 +233,7 @@ with aba_ret:
         yaxis_title="% médio retido",
         height=380,
     )
-    st.plotly_chart(fig, width="stretch", key="curva_retencao", config=ui.CONFIG_GRAFICO)
+    ui.grafico(fig, key="curva_retencao")
     ui.leitura(
         "A média cai de 100% para 34,5% no primeiro mês, fica perto de 30% até o "
         "quarto e desce abaixo de 20% a partir do sétimo. Reativar exige agir cedo."

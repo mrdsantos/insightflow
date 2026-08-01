@@ -12,6 +12,8 @@ import filtros
 import theme
 import ui
 
+cores = theme.paleta()
+
 st.title("Quanto vou faturar no próximo mês, e o quanto posso confiar nisso?")
 
 op = filtros.opcoes()
@@ -74,34 +76,34 @@ fig.add_scatter(
 )
 fig.add_scatter(
     x=datas_futuro, y=pd.concat([pd.Series([emenda["realizado"]]), futuro["banda_inf"]]),
-    mode="lines", line=dict(width=0), fill="tonexty", fillcolor=theme.RAMPA_AZUL[0],
+    mode="lines", line=dict(width=0), fill="tonexty", fillcolor=cores.RAMPA_AZUL[0],
     name="Banda (1,96 desvios do resíduo)", hoverinfo="skip",
 )
 fig.add_scatter(
     x=datas_realizado, y=realizado["realizado"], mode="lines",
-    name="Realizado", line=dict(color=theme.AZUL, width=2),
+    name="Realizado", line=dict(color=cores.AZUL, width=2),
     customdata=realizado["ano_mes"].map(ui.rotulo_mes),
     hovertemplate="%{customdata}: R$ %{y:,.0f}<extra>Realizado</extra>",
 )
 fig.add_scatter(
     x=datas_teste, y=teste["ajustado"], mode="lines",
-    name="Ajustado no teste", line=dict(color=theme.LARANJA, width=2),
+    name="Ajustado no teste", line=dict(color=cores.LARANJA, width=2),
     customdata=teste["ano_mes"].map(ui.rotulo_mes),
     hovertemplate="%{customdata}: R$ %{y:,.0f}<extra>Ajustado no teste</extra>",
 )
 fig.add_scatter(
     x=datas_futuro, y=linha_previsto, mode="lines",
-    name="Projeção", line=dict(color=theme.AZUL, width=2, dash="dash"),
+    name="Projeção", line=dict(color=cores.AZUL, width=2, dash="dash"),
     customdata=rot_futuro,
     hovertemplate="%{customdata}: R$ %{y:,.0f}<extra>Projeção</extra>",
 )
 for fase, inicio in [("teste", teste["ano_mes"].iloc[0]), ("projeção", futuro["ano_mes"].iloc[0])]:
     x = pd.Timestamp(inicio + "-01")
-    fig.add_vline(x=x, line_color=theme.GRADE, line_width=1)
+    fig.add_vline(x=x, line_color=cores.GRADE, line_width=1)
     # rotulo por dentro do grafico: ancorado por baixo ele subia para a faixa da legenda
     fig.add_annotation(
         x=x, y=1.0, yref="paper", yanchor="top", xanchor="left",
-        text=fase, showarrow=False, font=dict(color=theme.ROTULO_EIXO, size=11),
+        text=fase, showarrow=False, font=dict(color=cores.ROTULO_EIXO, size=11),
     )
 fig.update_layout(
     title="Faturamento mensal: realizado, ajuste no teste e projeção",
@@ -109,7 +111,7 @@ fig.update_layout(
     height=460,
 )
 fig.update_xaxes(**ui.eixo_mes(prev["ano_mes"], passo=3, como_data=True))
-st.plotly_chart(fig, width="stretch", key="previsao", config=ui.CONFIG_GRAFICO)
+ui.grafico(fig, key="previsao")
 ui.gemeo_tabular(prev)
 
 
