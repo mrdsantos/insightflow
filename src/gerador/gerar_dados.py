@@ -15,7 +15,8 @@ from datetime import date, timedelta
 from pathlib import Path
 
 SEED = 20260731
-CAMINHO_SAIDA = Path("dados/ecom_data.csv")
+RAIZ = Path(__file__).resolve().parent.parent.parent
+CAMINHO_SAIDA = RAIZ / "dados" / "ecom_data.csv"
 
 INICIO = date(2024, 7, 1)
 MESES = 24  # jul/2024 -> jun/2026

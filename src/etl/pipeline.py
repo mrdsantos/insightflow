@@ -128,7 +128,7 @@ def _gera_relatorio(linhas, limpos, rejeitados, resumo):
         "|---|---|",
         *[f"| {f} | {n} |" for f, n in formas_moeda.most_common()],
         "",
-        f"### Inconsistencias de texto",
+        "### Inconsistencias de texto",
         "",
         f"- Categorias distintas antes da normalizacao: {len(categorias_antes)}",
         f"- Status distintos antes da normalizacao: {len(status_antes)}",
