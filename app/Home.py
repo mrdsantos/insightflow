@@ -41,32 +41,49 @@ ticket_atual = kpis_per["faturamento"].sum() / kpis_per["pedidos"].sum()
 ret_atual = kpis_per["taxa_retencao"].mean()
 churn_atual = kpis_per["churn_rate"].mean()
 
-c1, c2, c3, c4 = st.columns(4)
+mensal = kpis_per.sort_values("ano_mes")
+
 if ant.empty:
-    c1.metric("Faturamento Total", ui.fmt_compacto(fat_atual))
-    c2.metric("Ticket Medio", ui.fmt_moeda(ticket_atual, 2))
-    c3.metric("Taxa de Retencao", ui.fmt_pct(ret_atual))
-    c4.metric("Churn Rate", ui.fmt_pct(churn_atual))
+    deltas = {k: None for k in ("fat", "ticket", "ret", "churn")}
 else:
     fat_ant = ant["faturamento"].sum()
     ticket_ant = ant["faturamento"].sum() / ant["pedidos"].sum()
-    c1.metric(
-        "Faturamento Total", ui.fmt_compacto(fat_atual),
-        delta=ui.fmt_pct(100 * (fat_atual - fat_ant) / fat_ant),
-    )
-    c2.metric(
-        "Ticket Medio", ui.fmt_moeda(ticket_atual, 2),
-        delta=ui.fmt_pct(100 * (ticket_atual - ticket_ant) / ticket_ant),
-    )
-    c3.metric(
-        "Taxa de Retencao", ui.fmt_pct(ret_atual),
-        delta=f"{ui.fmt_num(ret_atual - ant['taxa_retencao'].mean(), 1)} p.p.",
-    )
-    c4.metric(
-        "Churn Rate", ui.fmt_pct(churn_atual),
-        delta=f"{ui.fmt_num(churn_atual - ant['churn_rate'].mean(), 1)} p.p.",
-        delta_color="inverse",
-    )
+    deltas = {
+        "fat": 100 * (fat_atual - fat_ant) / fat_ant,
+        "ticket": 100 * (ticket_atual - ticket_ant) / ticket_ant,
+        "ret": ret_atual - ant["taxa_retencao"].mean(),
+        "churn": churn_atual - ant["churn_rate"].mean(),
+    }
+
+c1, c2, c3, c4 = st.columns(4)
+d = deltas["fat"]
+ui.stat_tile(
+    c1, "Faturamento Total", ui.fmt_compacto(fat_atual),
+    serie=mensal["faturamento"], key="spark_fat",
+    delta_texto=None if d is None else ui.fmt_pct(abs(d)),
+    subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
+)
+d = deltas["ticket"]
+ui.stat_tile(
+    c2, "Ticket Medio", ui.fmt_moeda(ticket_atual, 2),
+    serie=mensal["ticket_medio"], key="spark_ticket",
+    delta_texto=None if d is None else ui.fmt_pct(abs(d)),
+    subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
+)
+d = deltas["ret"]
+ui.stat_tile(
+    c3, "Taxa de Retencao", ui.fmt_pct(ret_atual),
+    serie=mensal["taxa_retencao"], key="spark_ret",
+    delta_texto=None if d is None else f"{ui.fmt_num(abs(d), 1)} p.p.",
+    subiu=d is not None and d >= 0, bom=d is not None and d >= 0,
+)
+d = deltas["churn"]
+ui.stat_tile(
+    c4, "Churn Rate", ui.fmt_pct(churn_atual),
+    serie=mensal["churn_rate"], key="spark_churn",
+    delta_texto=None if d is None else f"{ui.fmt_num(abs(d), 1)} p.p.",
+    subiu=d is not None and d >= 0, bom=d is not None and d <= 0,
+)
 
 
 # ---- Serie temporal de faturamento mensal ----------------------------------
