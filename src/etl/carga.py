@@ -39,6 +39,20 @@ def carrega_staging(conn, caminho_csv):
     return len(linhas)
 
 
+def carrega_quarentena(conn, rejeitados):
+    """Grava cada linha rejeitada inteira (JSONB) com o motivo da rejeicao."""
+    import json
+
+    with conn.cursor() as cur:
+        cur.execute("TRUNCATE dw.quarentena")
+        cur.executemany(
+            "INSERT INTO dw.quarentena (registro, motivo, etapa) VALUES (%s, %s, 'validacao')",
+            [(json.dumps(linha, ensure_ascii=False), motivo) for linha, motivo in rejeitados],
+        )
+    conn.commit()
+    return len(rejeitados)
+
+
 def le_staging(conn):
     """Devolve as linhas do staging como lista de dicts de texto (None preservado)."""
     with conn.cursor() as cur:
