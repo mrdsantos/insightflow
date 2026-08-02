@@ -2,10 +2,12 @@
 # le Python, entao a duplicacao e inevitavel - quem guarda a sincronia e
 # tests/test_tema.py.
 #
-# [theme] e o modo claro e o default: sem parametro na URL, e este que vale, e por
-# isso o dashboard nunca abre seguindo o tema do sistema operacional. De proposito
-# nao existe um [theme.light]: declarar os dois lados faria o Streamlit montar um
-# "Custom Theme Auto", que e justamente o que segue o sistema.
+# [theme] e o modo claro e [theme.dark] o escuro, mas nenhum dos dois e "o padrao":
+# basta existir uma subsecao de tema - uma so, nao as duas - para o Streamlit montar
+# tambem um "Custom Theme Auto" e escolher justamente ele quando a URL nao traz
+# `embed_options`. Auto segue o sistema operacional. Nao existe combinacao de config
+# que fixe o claro sem tornar o escuro inalcancavel: quem decide o modo e a URL, pelo
+# toggle em app/filtros.py.
 [theme]
 base = "light"
 primaryColor = "#2a78d6"
@@ -14,7 +16,8 @@ secondaryBackgroundColor = "#f9f9f7"
 textColor = "#0b0b0b"
 font = "sans serif"
 
-# Alcancado so por ?embed_options=dark_theme, que o toggle da sidebar monta.
+# Alcancado por ?embed_options=dark_theme, que o toggle monta, ou pelo Auto quando o
+# sistema esta em modo escuro.
 [theme.dark]
 primaryColor = "#3987e5"
 backgroundColor = "#1a1a19"

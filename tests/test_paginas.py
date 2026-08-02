@@ -48,19 +48,19 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.mark.parametrize("pagina", PAGINAS)
-@pytest.mark.parametrize("modo", ["claro", "escuro"])
-def test_pagina_renderiza_sem_excecao(pagina, modo):
+@pytest.mark.parametrize("tipo,rotulo", [("light", "Tema escuro"), ("dark", "Tema claro")])
+def test_pagina_renderiza_sem_excecao(pagina, tipo, rotulo, modo_do_frontend):
     """Os dois modos passam pelo smoke.
 
-    O modo entra pela query string porque e assim que o toggle o entrega: a paleta
-    e resolvida por sessao, entao renderizar so no claro deixaria metade do app
-    sem cobertura.
+    O modo entra pelo sinal do navegador, que e de onde a paleta vem de verdade;
+    renderizar so no claro deixaria metade do app sem cobertura.
     """
+    modo_do_frontend(tipo)
     sys.path.insert(0, str(APP))  # as paginas usam import plano: dados, filtros, theme, ui
     at = AppTest.from_file(str(APP / pagina), default_timeout=60)
-    at.query_params["tema"] = modo
     at.run()
     assert not at.exception
-    # sem isto o parametro seria decorativo: um erro na resolucao do modo faria os
-    # dez casos passarem todos no claro.
-    assert at.session_state["tema"] == modo
+    # Sem isto o duble seria decorativo: um erro na resolucao do modo faria os dez
+    # casos passarem todos no claro. O rotulo do toggle nomeia o modo oposto ao
+    # corrente, entao ele prova que a paleta chegou ate a pagina.
+    assert any(rotulo in m.value for m in at.markdown)
