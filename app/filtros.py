@@ -17,6 +17,7 @@ import streamlit as st
 
 import dados
 import theme
+import ui
 
 STATUS_CONCRETIZADA = ["Entregue", "Enviado"]
 
@@ -119,6 +120,11 @@ def sidebar(op: dict) -> dict:
     Chaves fixas em st.session_state; como a sidebar aparece em toda pagina,
     o Streamlit preserva o estado na navegacao.
     """
+    # A marca sai daqui, e nao das paginas, porque `sidebar()` e o unico ponto que
+    # roda nas cinco. Fica fora do `with`: st.logo escreve no cabecalho da barra,
+    # nao no container corrente.
+    ui.marca()
+
     for chave, valor in _defaults(op).items():
         st.session_state.setdefault(chave, valor)
 
