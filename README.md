@@ -150,3 +150,8 @@ Itens que o enunciado não pede, construídos por decisão própria:
   antes de ele entrar. Quem escolhe o modo é o frontend do Streamlit, e o Python só
   pergunta qual saiu: era ele decidir por conta própria que deixava o fundo e o gráfico em
   modos diferentes. Números e o achado em [docs/decisoes.md](docs/decisoes.md).
+- **Marca no topo da sidebar**: três linhas de mesma largura, acima do menu de páginas, nas
+  cores da paleta e nos dois modos. É um SVG gerado em tempo de execução porque a posição só
+  é alcançável pelo `st.logo`, que aceita imagem, e porque justificar as três linhas à mesma
+  medida depende da fonte que o sistema entrega - o `textLength` do SVG resolve isso sem
+  depender de medição prévia. O porquê de cada número em [docs/decisoes.md](docs/decisoes.md).

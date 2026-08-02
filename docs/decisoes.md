@@ -303,3 +303,65 @@ A margem maior vale para todo gráfico, inclusive os sem legenda. Aumentar só o
 economizaria espaço em branco, mas desalinharia as áreas de plotagem de gráficos lado a lado
 (na Home, sazonalidade tem legenda e categorias não, e as duas dividem a mesma linha). Alinhamento
 entre painéis vizinhos vale mais que 28px de altura.
+
+## A marca da sidebar é um SVG gerado, não HTML
+
+A marca são três linhas de mesma largura - `INSIGHTFLOW` em cima, `PROJETO` e `DESENVOLVE`
+embaixo - no topo da barra lateral, acima do menu de páginas. Duas restrições do Streamlit
+decidiram a implementação inteira.
+
+A primeira é de posição. Tudo que passa por `st.sidebar` cai em `stSidebarUserContent`, que
+fica **abaixo** do menu de páginas. O único ponto acima do menu é o cabeçalho da barra, e a
+única API que escreve nele é `st.logo()`, que aceita imagem. Daí a marca ser imagem, e não
+um `st.markdown` com HTML: não é preferência, é o que a posição pedida permite.
+
+A segunda é de tipografia. Justificar três linhas à mesma medida exige controlar o espaço
+entre letras, e o valor certo depende da fonte que o sistema operacional entrega - `PROJETO`
+tem 7 caracteres contra os 10 de `DESENVOLVE`, então nenhum espaçamento fixo serve para as
+duas. O SVG resolve isso de graça: `textLength` com `lengthAdjust="spacing"` estica cada
+linha até a medida distribuindo a diferença nos avanços entre glifos, sem deformar as letras.
+O retângulo fecha em qualquer máquina. Em HTML seria um `<span>` por letra.
+
+Os números, todos em `app/ui.py`:
+
+- **Bloco de 176 x 53px.** 176 é o maior bloco que cabe centralizado nos 240px úteis da barra
+  deixando livres os 32px que o botão de recolher ocupa à direita. 53px de altura cabem nos
+  60px do cabeçalho nativo, e é o alinhamento central dele que dá o respiro em cima e embaixo -
+  se o bloco tivesse 64px, seria obrigatório reescrever a altura do cabeçalho e o offset do
+  botão.
+- **21px na primeira linha.** "INSIGHTFLOW" em negrito mede de 7,3 a 8,0 vezes o corpo conforme
+  a fonte do sistema (Segoe UI no Windows, DejaVu Sans no Linux do contêiner). A 21px o pior
+  caso dá 168px, ainda abaixo dos 176, então o ajuste é sempre espaçamento positivo. A 22px o
+  pior caso ultrapassaria a medida e o `lengthAdjust` entraria em espaçamento negativo,
+  encostando as letras.
+- **A primeira linha também é esticada.** No espaçamento natural ela mediria entre 153px e
+  168px conforme a fonte, e as duas de baixo, presas a uma medida fixa, só casariam com ela na
+  máquina onde os números foram medidos.
+- **Maiúscula nas duas linhas de baixo.** A justificação impõe 1,7em de espaçamento em
+  `PROJETO` contra 0,9em em `DESENVOLVE`, e a diferença absoluta entre os dois é fixa em cerca
+  de um dezoito avos da medida, independente do corpo: não há tamanho que a faça sumir. Em
+  caixa alta isso lê como lockup editorial, o mesmo idioma de um kicker espaçado; em caixa de
+  título leria como falha de renderização.
+- **Azul na primeira linha, tinta secundária nas outras.** Nenhum token novo - a marca usa a
+  paleta que já existe, resolvida por sessão como todo o resto. Contra o fundo da barra, o azul
+  dá 4,19:1 no claro e 5,35:1 no escuro, e a 21px em negrito o critério aplicável é o de texto
+  grande (3:1). A tinta secundária dá 7,53:1 e 10,88:1, acima dos 4,5:1 exigidos para os 12px
+  do descritor. O cinza de rótulo de eixo foi descartado: 3,40:1 no claro, reprovado.
+- **Uma variante de uma linha para a barra recolhida.** Ali o Streamlit mostra o mesmo logo no
+  cabeçalho do app com teto de 32px, onde o descritor ficaria com 7px de corpo. Como a altura
+  do viewBox e a altura renderizada coincidem, a escala é 1:1 e a palavra sai do mesmo tamanho
+  da barra aberta: recolher tira o descritor e mais nada.
+
+Dois custos aceitos, ambos sem contorno razoável:
+
+- **O texto vira imagem.** O frontend do Streamlit escreve `alt="Logo"` fixo, e `<title>` ou
+  `aria-label` dentro de um SVG carregado via `<img>` não chegam à tecnologia assistiva. A
+  marca não é selecionável nem pesquisável. O que sobra: o nome do projeto já é anunciado pelo
+  `<title>` do documento, que as cinco páginas definem em `st.set_page_config`. Corrigir o
+  `alt` exigiria `unsafe_allow_javascript=True`, risco maior que o problema.
+- **Três regras de CSS dependem de contrato privado.** `stSidebarLogo` e `stSidebarHeader` são
+  `data-testid` internos, não API. Sem elas o Streamlit trava a imagem em 32px de altura. A
+  degradação é segura: se os seletores mudarem, a marca volta a 32px alinhada à esquerda - feia,
+  legível, sem estourar layout. Com `streamlit==1.60.0` pinado, a mudança só chega quando
+  alguém subir a versão de propósito. `tests/test_marca.py` guarda a intenção das regras para
+  que ninguém as apague achando que são decorativas.
