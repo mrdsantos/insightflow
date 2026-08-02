@@ -171,17 +171,18 @@ _MARCA_LINHAS = (
 # nele e o st.logo - que trava a altura da imagem em 32px. Estas tres regras
 # destravam a altura e centralizam o bloco. A margem esquerda de 2rem espelha os
 # 32px reservados pelo botao de recolher, que continua no canto sem ser tocado.
-# A altura do cabecalho nao e mexida: os 60px nativos sao maiores que o bloco, e
-# e o alinhamento central deles que da o respiro em cima e embaixo. O min-height
-# so existe para o dia em que o Streamlit reduzir esse numero.
+# O cabecalho tem altura fixa de 60px, menor que os 69px que a marca passou a pedir
+# com 1rem de respiro em cima, entao ele vira `height:auto` e cresce com o conteudo -
+# sem isso a margem empurraria a marca para fora em vez de afasta-la do topo. O
+# min-height fica como guarda para o dia em que o Streamlit reduzir o numero nativo.
 # Sao seletores privados do Streamlit: se mudarem, a marca volta a 32px e alinhada
 # a esquerda - feia, legivel, sem estourar layout.
 CSS_MARCA = f"""
 <style>
 [data-testid="stSidebarLogo"]{{height:{MARCA_ALTURA}px !important;
-margin-top:0 !important;margin-bottom:0 !important;width:100%;
+margin-top:1rem !important;margin-bottom:0 !important;width:100%;
 object-position:center !important}}
-[data-testid="stSidebarHeader"]{{min-height:{MARCA_ALTURA}px}}
+[data-testid="stSidebarHeader"]{{height:auto;min-height:{MARCA_ALTURA}px}}
 [data-testid="stSidebarHeader"]>*:first-child{{flex:1 1 auto;min-width:0;
 margin-left:2rem}}
 </style>
